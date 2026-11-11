@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Super Korona Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: fixed left rail of tabs, one working surface on the right. Marigold marks anything projected or needing action. */
+:root{
+  --bg:#EBEFEC; --surface:#F7F9F8; --surface2:#E1E7E3; --ink:#12231E; --ink2:#4B5E57; --line:#CAD4CF;
+  --accent:#B35A00; --accent-ink:#FFFFFF; --accent-soft:#F4E2CC;
+  --series:#1D6B58; --series-soft:#BFD9D0; --good:#1F7A4D; --bad:#B8332B; --bad-soft:#F3D6D3; --good-soft:#CDE7D9;
+  --heat0:#E1E7E3; --heat1:#1D6B58;
+  --f-display:'Big Shoulders Display','Arial Narrow',sans-serif; --f-body:'Instrument Sans',system-ui,sans-serif; --f-mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1A16; --surface:#13251F; --surface2:#1B332C; --ink:#E8F1ED; --ink2:#9BB4AB; --line:#26443B;
+  --accent:#F2A03A; --accent-ink:#1A1208; --accent-soft:#3B2A12;
+  --series:#7FD1B9; --series-soft:#1F4A3F; --good:#5BC48A; --bad:#FF8076; --bad-soft:#4A2320; --good-soft:#1B4531;
+  --heat0:#1B332C; --heat1:#7FD1B9; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1A16; --surface:#13251F; --surface2:#1B332C; --ink:#E8F1ED; --ink2:#9BB4AB; --line:#26443B;
+  --accent:#F2A03A; --accent-ink:#1A1208; --accent-soft:#3B2A12;
+  --series:#7FD1B9; --series-soft:#1F4A3F; --good:#5BC48A; --bad:#FF8076; --bad-soft:#4A2320; --good-soft:#1B4531;
+  --heat0:#1B332C; --heat1:#7FD1B9; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:auto}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:800;letter-spacing:.01em;text-wrap:balance}
+h2{font-size:34px;line-height:1.05}
+h3{font-size:22px;line-height:1.1}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.shell{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:208px minmax(0,1fr);gap:28px;align-items:start}
+.rail{position:sticky;top:max(20px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:20px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:30px;line-height:.95}
+.brand small{display:block;font:500 13px var(--f-body);color:var(--ink2);margin-top:6px}
+.tabs{display:flex;flex-direction:column;gap:2px}
+.tab{appearance:none;border:0;background:none;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--ink2);font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tab:hover{background:var(--surface2);color:var(--ink)}
+.tab[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.tab .badge{font:600 12px var(--f-body);background:var(--accent);color:var(--accent-ink);border-radius:99px;padding:1px 8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.railnote{font-size:13px;color:var(--ink2);border-top:1px solid var(--line);padding-top:14px}
+.main{min-width:0;display:flex;flex-direction:column;gap:22px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.head p{color:var(--ink2);max-width:62ch;margin-top:6px}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:14px}
+.banner b{font-weight:700}
+.link{appearance:none;background:none;border:0;padding:0;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.card h3{margin-bottom:12px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.stat{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .k{font-size:13px;color:var(--ink2)}
+.stat .v{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1}
+.stat .s{font-size:13px;color:var(--ink2)}
+.pos{color:var(--good)} .neg{color:var(--bad)} .proj{color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 12.5px var(--f-body);padding:2px 9px;border-radius:99px;background:var(--surface2);color:var(--ink2);white-space:nowrap}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.warn{background:var(--accent-soft);color:var(--accent)}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;min-height:38px}
+.btn:hover{border-color:var(--ink2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:4px 10px;min-height:30px;font-size:13.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
+.seg button{appearance:none;border:0;background:var(--surface);padding:7px 13px;font-weight:600;cursor:pointer;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-weight:600;color:var(--ink2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th.r,td.r{text-align:right}
+tr:last-child td{border-bottom:0}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover{background:var(--surface2)}
+.muted{color:var(--ink2)} .small{font-size:13px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.empty{padding:28px;text-align:center;color:var(--ink2);border:1px dashed var(--line);border-radius:12px}
+/* charts */
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--ink2);font:12px var(--f-body)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+/* heat map */
+.heat{display:grid;gap:3px;min-width:560px}
+.heat .cell{height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11.5px}
+.heat .lab{font-size:12.5px;color:var(--ink2);display:flex;align-items:center}
+.heat .hl{justify-content:center;height:auto}
+/* receipt: the one loud element */
+.receipt{font-family:var(--f-mono);font-size:13.5px;background:var(--surface);border:1px solid var(--line);padding:22px 20px 26px;position:relative;max-width:460px;
+  -webkit-mask:radial-gradient(circle 6px at 6px 100%,#0000 98%,#000) 0 0/12px 100%;mask:radial-gradient(circle 6px at 6px 100%,#0000 98%,#000) 0 0/12px 100%}
+.receipt .t{text-align:center;font-family:var(--f-display);font-size:26px;font-weight:800;letter-spacing:.04em}
+.receipt .sub{text-align:center;color:var(--ink2);margin-bottom:14px}
+.receipt .ln{display:flex;gap:6px;align-items:baseline;padding:2px 0}
+.receipt .ln .dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-3px)}
+.receipt .tot{border-top:2px solid var(--ink);margin-top:10px;padding-top:8px;font-weight:500;font-size:16px}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:640px}
+.cal .dow{font-size:12.5px;color:var(--ink2);padding:2px 6px}
+.cal .day{min-height:92px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;cursor:pointer;text-align:left;appearance:none;font:inherit;color:inherit}
+.cal .day:hover{border-color:var(--ink2)}
+.cal .day.out{opacity:.45}
+.cal .day.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.cal .dn{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.chip{font-size:12px;line-height:1.25;border-radius:5px;padding:2px 5px;background:var(--series-soft);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.future{background:var(--accent-soft)}
+.chip.loss{background:var(--bad-soft)}
+/* forms + modal */
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:13px;font-weight:600;color:var(--ink2)}
+.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:38px;width:100%}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fgrid .full{grid-column:1/-1}
+.scrim{position:fixed;inset:0;background:rgba(5,12,10,.62);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(24px,env(safe-area-inset-top,0px)) 16px 24px;overflow:auto}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;width:100%;max-width:520px;display:flex;flex-direction:column;gap:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-weight:600;z-index:60;max-width:90vw}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.step button{appearance:none;border:0;background:var(--surface2);width:30px;height:30px;cursor:pointer;font-weight:700}
+.step span{min-width:38px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--series);border-radius:99px}
+.bar.low i{background:var(--accent)} .bar.out i{background:var(--bad)}
+.cards{display:none}
+@media (max-width:980px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(2,minmax(0,1fr))} .g21{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:16px}
+  .rail{position:static;gap:12px}
+  .tabs{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:4px}
+  .tab{white-space:nowrap}
+  .railnote{display:none}
+  .stat .v{font-size:38px}
+  h2{font-size:30px}
+  .tbl-inv{display:none} .cards{display:flex;flex-direction:column;gap:10px}
+}
+@media (max-width:560px){
+  .g2,.g3,.g4{grid-template-columns:minmax(0,1fr)} .fgrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:no-preference){.rise{animation:rise .5s ease both}@keyframes rise{from{opacity:.0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">Super Korona<small>Sales, nights and stock</small></div>
+    <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+    <div class="railnote">Sales figures are sample data until Clover is connected. Events, costs and inventory you enter are saved.</div>
+  </aside>
+  <main class="main" id="main" aria-live="polite"></main>
+</div>
+<div id="overlay"></div>
+<div id="toast" class="toast" hidden></div>
+<script>
+"use strict";
+/* ============ helpers ============ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = (n, d=0) => (n<0?"-":"") + "$" + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const moneyS = n => (n>0?"+":n<0?"-":"") + "$" + Math.abs(Math.round(n)).toLocaleString("en-US");
+const pct = (n, d=0) => (n*100).toFixed(d) + "%";
+const clamp = (x,a,b) => Math.min(b, Math.max(a, x));
+const pad = n => String(n).padStart(2,"0");
+const key = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (d,n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()+n); return x; };
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DOWL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const fmtDay = k => { const d = parse(k); return DOW[d.getDay()]+", "+MON[d.getMonth()].slice(0,3)+" "+d.getDate(); };
+const hourLabel = h => { const x = h%24; return (x%12||12) + (x<12?"a":"p"); };
+const sum = a => a.reduce((s,x)=>s+x,0);
+const mean = a => a.length ? sum(a)/a.length : 0;
+const sd = a => { if(a.length<2) return 0; const m = mean(a); return Math.sqrt(mean(a.map(x=>(x-m)**2))); };
+const today = new Date(); today.setHours(0,0,0,0);
+const TODAY = key(today);
+function hash(s){ let h = 2166136261; for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h,16777619); } return h>>>0; }
+function rng(seed){ let a = seed>>>0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1|a); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
+
+/* ============ sales data source ============
+   Everything below this block reads sales through SALES.days().
+   To go live, replace sampleSales() with a call to your small server that proxies Clover
+   (orders -> line items) and returns the same shape:
+   [{date:"2026-11-10", gross, tx, hourly:[24 numbers], items:{"Corona Extra":qty,...}}]  */
+const MENU = [
+  {n:"Corona Extra",p:6,share:.13,drift:.004},{n:"Modelo Especial",p:6,share:.09,drift:.012},{n:"Bud Light",p:5,share:.06,drift:-.014},
+  {n:"Well tequila shot",p:7,share:.07,drift:0},{n:"Don Julio shot",p:14,share:.07,drift:.006},{n:"Margarita",p:11,share:.11,drift:.016},
+  {n:"Vodka soda",p:9,share:.08,drift:-.004},{n:"Jack & Coke",p:9,share:.06,drift:-.01},{n:"Hennessy neat",p:15,share:.07,drift:.008},
+  {n:"Hennessy & Coke",p:14,share:.06,drift:.003},{n:"Red Bull vodka",p:12,share:.04,drift:-.006},{n:"Bottle service",p:300,share:.16,drift:.01}
+];
+const BASE = {0:1100,1:430,2:520,3:820,4:1500,5:3250,6:3900};
+const BOOST = {"2026-09-26":1.3,"2026-10-02":1.2,"2026-10-10":.95,"2026-10-17":1.26,"2026-10-23":1.22,"2026-10-31":1.55,"2026-11-04":1.12,"2026-11-07":1.18};
+const HOURW = {
+  0:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,6,7,6,4,2,1],
+  1:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,5,5,4,3,2,1],
+  2:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,5,6,5,3,2,1],
+  3:[2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,5,8,10,9,6,4],
+  4:[4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,5,8,12,14,12,8],
+  5:[9,7,3,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,4,6,9,13,17,16],
+  6:[9,7,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,5,8,12,16,17]
+};
+function sampleSales(){
+  const out = [];
+  for(let i=84;i>=1;i--){
+    const d = addDays(today,-i), k = key(d), w = d.getDay(), r = rng(hash(k));
+    const weeks = (84-i)/7, growth = 1 + .012*weeks;
+    const day = BASE[w] * growth * (BOOST[k]||1) * (.88 + r()*.24);
+    const items = {}; let gross = 0;
+    MENU.forEach(m => {
+      const wk = 1 + m.drift*weeks*2;
+      const q = Math.max(0, Math.round(day * m.share * wk * (.85 + r()*.3) / m.p));
+      items[m.n] = q; gross += q * m.p;
+    });
+    const hw = HOURW[w], tw = sum(hw);
+    const hourly = hw.map(x => Math.round(gross * x / tw * (.9 + r()*.2)));
+    const tx = Math.max(1, Math.round(gross / (20 + r()*5)));
+    out.push({date:k, gross, tx, hourly, items});
+  }
+  return out;
+}
+const SALES = { _d:null, days(){ return this._d || (this._d = sampleSales()); }, live:false };
+
+/* ============ analytics ============ */
+/* normal-night baseline: event nights are left out of each weekday's list (when at least 3 other nights exist) so they are not counted twice */
+function weekdayStats(days, weeks=8){
+  const ex = new Set(S.events.map(e=>e.date)), recent = days.slice(-weeks*7), by = {}, all = {};
+  for(let w=0;w<7;w++){ by[w] = []; all[w] = []; }
+  recent.forEach(d => { const w = parse(d.date).getDay(); all[w].push(d.gross); if(!ex.has(d.date)) by[w].push(d.gross); });
+  for(let w=0;w<7;w++) if(by[w].length < 3) by[w] = all[w];
+  return by;
+}
+function growthFactor(days){
+  const ex = new Set(S.events.map(e=>e.date)), a = days.slice(-28), b = days.slice(-56,-28), r = [];
+  for(let w=0;w<7;w++){
+    const pick = arr => arr.filter(d => parse(d.date).getDay()===w && !ex.has(d.date)).map(d=>d.gross);
+    const x = pick(a), y = pick(b);
+    if(x.length && y.length && mean(y) > 0) r.push(mean(x)/mean(y));
+  }
+  return r.length ? clamp(mean(r), .9, 1.12) : 1;
+}
+function eventUplift(days, events){
+  const by = weekdayStats(days, 12), ups = [];
+  events.forEach(e => {
+    const d = days.find(x => x.date === e.date); if(!d) return;
+    const avg = mean(by[parse(e.date).getDay()]); if(avg>0) ups.push(d.gross/avg);
+  });
+  return ups.length >= 2 ? clamp(mean(ups), 1, 1.8) : 1.2;
+}
+/* forecast for the next n days. Base = average of the same weekday over the last 8 weeks, scaled by the 4-week trend. */
+function forecast(days, events, n=14){
+  const by = weekdayStats(days), g = growthFactor(days), up = eventUplift(days, events.filter(e=>e.date<TODAY));
+  const evBy = {}; events.forEach(e => evBy[e.date] = e);
+  const out = [];
+  for(let i=0;i<n;i++){
+    const d = addDays(today,i), k = key(d), w = d.getDay(), vals = by[w];
+    let base = mean(vals) * g, band = sd(vals) * .8, ev = evBy[k] || null, uplift = 1;
+    if(ev){ uplift = up; base *= uplift; band *= uplift; }
+    out.push({date:k, w, mid:base, lo:Math.max(0,base-band), hi:base+band, event:ev, uplift});
+  }
+  return out;
+}
+/* how far off would this method have been on the last 28 days? */
+function backtest(days){
+  const errs = [], ex = new Set(S.events.map(e=>e.date));
+  for(let i=Math.max(56,days.length-28); i<days.length; i++){
+    if(ex.has(days[i].date)) continue;
+    const w = parse(days[i].date).getDay(), prior = days.slice(Math.max(0,i-56), i).filter(d => parse(d.date).getDay()===w && !ex.has(d.date)).map(d=>d.gross);
+    if(prior.length < 4 || days[i].gross <= 0) continue;
+    errs.push(Math.abs(mean(prior) - days[i].gross) / days[i].gross);
+  }
+  return errs.length ? mean(errs) : null;
+}
+function weekStart(d){ const x = addDays(d, -((d.getDay()+6)%7)); return x; } /* Monday */
+function rangeSum(days, from, to){ return days.filter(d => d.date>=from && d.date<=to); }
+function costs(settings, gross){ return { cogs: gross*settings.cogsPct/100, labor: gross*settings.laborPct/100 }; }
+/* money picture for one event night */
+function eventMoney(ev, days, settings, fc){
+  const d = days.find(x => x.date === ev.date), f = fc.find(x => x.date === ev.date);
+  const hasActual = ev.gross != null && ev.gross !== "";
+  let gross = null, kind = "";
+  if(hasActual){ gross = +ev.gross; kind = "entered"; }
+  else if(d){ gross = d.gross; kind = "clover"; }
+  else if(f){ gross = f.mid; kind = "projected"; }
+  const cost = (+ev.djFee||0) + (+ev.otherCost||0);
+  if(gross == null) return {gross:null, cost, net:null, kind:"none", lift:null, paid:null};
+  const c = costs(settings, gross), net = gross - c.cogs - c.labor - cost;
+  const by = weekdayStats(days, 12), usual = mean(by[parse(ev.date).getDay()]);
+  const lift = usual ? gross - usual : null;
+  const paid = lift == null ? null : lift*(1 - settings.cogsPct/100) - cost;
+  return {gross, cost, net, kind, lift, paid, usual};
+}
+
+/* ============ saved data (events, inventory, cost assumptions) ============ */
+const S = {tab:"overview", events:[], inv:[], settings:{cogsPct:27,laborPct:22,fixedWeek:0}, loaded:false, db:null, slow:false,
+  month:new Date(today.getFullYear(), today.getMonth(), 1), report:"ledger", weekBack:0, trendDay:"all", invFilter:"all"};
+const TABS = [["overview","Overview"],["reports","Reports"],["forecast","Forecast"],["trends","Trends"],["events","Events"],["inventory","Inventory"]];
+let toastT;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, 2600); }
+async function initStore(){
+  let db = null;
+  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch(e){ db = null; }
+  S.db = db;
+  if(!db){ S.loaded = true; render(); return; }
+  const timer = setTimeout(()=>{ if(!S.loaded){ S.loaded = true; S.slow = true; render(); } }, 10000);
+  const done = () => { S.loaded = true; S.slow = false; clearTimeout(timer); render(); };
+  db.collection("events").onSnapshot(s => { S.events = s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>a.date.localeCompare(b.date)); done(); }, done);
+  db.collection("inventory").onSnapshot(s => { S.inv = s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>(a.cat+a.name).localeCompare(b.cat+b.name)); done(); }, done);
+  db.doc("settings/main").onSnapshot(s => { if(s.exists) S.settings = {...S.settings, ...s.data()}; done(); }, done);
+}
+async function save(path, data){
+  if(!S.db){ toast("Saving is not available in this view. Open the page from claude.ai while signed in."); return false; }
+  try { await S.db.doc(path).set(data); return true; } catch(e){ toast("Could not save. Check your access and try again."); return false; }
+}
+async function remove(path){
+  if(!S.db) return false;
+  try { await S.db.doc(path).delete(); return true; } catch(e){ toast("Could not delete."); return false; }
+}
+function newId(col){ return S.db ? S.db.collection(col).doc().id : col[0]+Date.now().toString(36); }
+
+/* ============ charts (all drawn from one scale) ============ */
+function niceMax(v){ if(v<=0) return 100; const p = Math.pow(10, Math.floor(Math.log10(v))); for(const m of [1,1.5,2,2.5,3,4,5,6,8,10]) if(m*p >= v) return m*p; return 10*p; }
+const kfmt = v => v>=1000 ? "$"+(v/1000).toFixed(v%1000?1:0)+"k" : "$"+Math.round(v);
+function barChart(pts){
+  const W=720, H=250, L=46, R=8, T=14, B=40, iw=W-L-R, ih=H-T-B, max = niceMax(Math.max(1,...pts.map(p=>p.hi||p.v)));
+  const bw = iw/pts.length, y = v => T + ih - v/max*ih;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily gross sales, last 14 days and next 7 days projected">`;
+  [0,.5,1].forEach(f => { const v = max*f; s += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${kfmt(v)}</text>`; });
+  pts.forEach((p,i) => {
+    const x = L + i*bw + bw*.14, w = bw*.72, fut = p.kind==="fcst";
+    s += `<rect x="${x.toFixed(1)}" y="${y(p.v).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(1,ih-(y(p.v)-T)).toFixed(1)}" rx="3" fill="${fut?"var(--accent)":"var(--series)"}" opacity="${fut?.85:1}"><title>${esc(p.tip)}</title></rect>`;
+    if(p.today) s += `<circle cx="${(x+w/2).toFixed(1)}" cy="${H-B+34}" r="3" fill="var(--accent)"/>`;
+    s += `<text x="${(x+w/2).toFixed(1)}" y="${H-B+14}" text-anchor="middle">${p.l1}</text><text x="${(x+w/2).toFixed(1)}" y="${H-B+27}" text-anchor="middle">${p.l2}</text>`;
+  });
+  return s + `</svg>`;
+}
+function lineChart(act, fc){
+  const W=760, H=270, L=46, R=10, T=14, B=30, iw=W-L-R, ih=H-T-B, n = act.length+fc.length;
+  const max = niceMax(Math.max(...act.map(a=>a.v), ...fc.map(f=>f.hi)));
+  const x = i => L + i/(n-1)*iw, y = v => T + ih - v/max*ih;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily sales for the last 28 days and projected sales for the next 14 days">`;
+  [0,.25,.5,.75,1].forEach(f => { const v = max*f; s += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${kfmt(v)}</text>`; });
+  const sx = x(act.length-.5);
+  s += `<line x1="${sx}" x2="${sx}" y1="${T}" y2="${T+ih}" stroke="var(--ink2)" stroke-dasharray="3 4"/><text x="${sx+6}" y="${T+11}">today</text>`;
+  const band = fc.map((f,i)=>`${x(act.length+i).toFixed(1)},${y(f.hi).toFixed(1)}`).join(" ") + " " + fc.slice().reverse().map((f,i)=>`${x(n-1-i).toFixed(1)},${y(f.lo).toFixed(1)}`).join(" ");
+  s += `<polygon points="${band}" fill="var(--accent)" opacity=".18"/>`;
+  s += `<polyline fill="none" stroke="var(--series)" stroke-width="2.2" stroke-linejoin="round" points="${act.map((a,i)=>`${x(i).toFixed(1)},${y(a.v).toFixed(1)}`).join(" ")}"/>`;
+  s += `<polyline fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-dasharray="6 4" stroke-linejoin="round" points="${fc.map((f,i)=>`${x(act.length+i).toFixed(1)},${y(f.mid).toFixed(1)}`).join(" ")}"/>`;
+  fc.forEach((f,i) => { if(f.event) s += `<circle cx="${x(act.length+i).toFixed(1)}" cy="${y(f.mid).toFixed(1)}" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"><title>${esc(f.event.name)}</title></circle>`; });
+  const lab = [0, 7, 14, 21, 28, 35, 41];
+  lab.forEach(i => { const d = i<act.length ? act[i].date : fc[i-act.length].date, dd = parse(d); s += `<text x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="${i===0?"start":i===n-1?"end":"middle"}">${MON[dd.getMonth()].slice(0,3)} ${dd.getDate()}</text>`; });
+  return s + `</svg>`;
+}
+function spark(vals, w=88, h=26){
+  const mx = Math.max(1,...vals), mn = Math.min(...vals), rg = Math.max(1, mx-mn), n = vals.length;
+  const pts = vals.map((v,i)=>`${(i/(n-1)*(w-4)+2).toFixed(1)},${(h-3-(v-mn)/rg*(h-6)).toFixed(1)}`);
+  const last = pts[pts.length-1].split(",");
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline fill="none" stroke="var(--series)" stroke-width="1.8" points="${pts.join(" ")}"/><circle cx="${last[0]}" cy="${last[1]}" r="2.6" fill="var(--accent)"/></svg>`;
+}
+
+/* ============ shared numbers ============ */
+function invStatus(i){
+  const oh = +i.onHand||0, par = +i.par||0;
+  if(oh <= 0) return "out";
+  if(oh < par) return "low";
+  return "ok";
+}
+function weekNet(days, from, to){
+  const rows = rangeSum(days, from, to), gross = sum(rows.map(d=>d.gross)), c = costs(S.settings, gross);
+  const evc = sum(S.events.filter(e=>e.date>=from && e.date<=to).map(e=>(+e.djFee||0)+(+e.otherCost||0)));
+  const nd = Math.max(1, rows.length), fixed = S.settings.fixedWeek * nd/7;
+  return {rows, gross, tx:sum(rows.map(d=>d.tx)), cogs:c.cogs, labor:c.labor, evc, fixed, net: gross-c.cogs-c.labor-evc-fixed, nd};
+}
+function itemTotals(days){
+  const t = {}; days.forEach(d => Object.entries(d.items).forEach(([n,q]) => { t[n] = (t[n]||0)+q; })); return t;
+}
+function priceOf(n){ const m = MENU.find(x=>x.n===n); return m ? m.p : 0; }
+
+/* ============ overview ============ */
+function viewOverview(){
+  const days = SALES.days(), last7 = days.slice(-7), prev7 = days.slice(-14,-7);
+  const g7 = sum(last7.map(d=>d.gross)), p7 = sum(prev7.map(d=>d.gross)), ch = p7 ? g7/p7-1 : 0;
+  const fc = forecast(days, S.events, 14), f7 = sum(fc.slice(0,7).map(f=>f.mid));
+  const a = days[days.length-1] ? weekNet(days, last7[0].date, last7[last7.length-1].date) : {net:0};
+  const stock = S.inv.filter(i => invStatus(i)!=="ok"), outN = S.inv.filter(i=>invStatus(i)==="out").length;
+  const pts = days.slice(-14).map(d => ({v:d.gross, kind:"act", l1:DOW[parse(d.date).getDay()][0], l2:parse(d.date).getDate(), tip:fmtDay(d.date)+": "+money(d.gross)}))
+    .concat(fc.slice(0,7).map((f,i) => ({v:f.mid, hi:f.hi, kind:"fcst", today:i===0, l1:DOW[f.w][0], l2:parse(f.date).getDate(), tip:fmtDay(f.date)+": about "+money(f.mid)+(f.event?" ("+f.event.name+")":"")})));
+  const upcoming = S.events.filter(e=>e.date>=TODAY).slice(0,3);
+  const tot = itemTotals(last7), top = Object.entries(tot).map(([n,q])=>[n,q,q*priceOf(n)]).sort((x,y)=>y[2]-x[2]).slice(0,5);
+  const hr = Array(24).fill(0); days.slice(-28).forEach(d => d.hourly.forEach((v,h)=>{ hr[h]+=v; }));
+  const bestH = hr.map((v,h)=>[h,v]).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>x[0]).sort((a,b)=>((a+20)%24)-((b+20)%24));
+  return `
+  <div class="head rise"><div><h2>${DOWL[today.getDay()]}, ${MON[today.getMonth()]} ${today.getDate()}</h2>
+    <p>Last 7 days, the week ahead, and what needs attention before the next busy night.</p></div></div>
+  ${banner()}
+  <div class="grid g4">
+    <div class="card stat"><span class="k">Gross sales, last 7 days</span><span class="v num">${money(g7)}</span><span class="s ${ch>=0?"pos":"neg"}">${ch>=0?"Up":"Down"} ${pct(Math.abs(ch),0)} vs the 7 days before</span></div>
+    <div class="card stat"><span class="k">Expected next 7 days</span><span class="v num proj">${money(f7)}</span><span class="s">Typical weekday pattern, adjusted for trend and events</span></div>
+    <div class="card stat"><span class="k">Net, last 7 days (est.)</span><span class="v num ${a.net>=0?"pos":"neg"}">${money(a.net)}</span><span class="s">After cost of goods, labor, event costs${S.settings.fixedWeek?" and fixed costs":""}</span></div>
+    <button class="card stat" style="text-align:left;cursor:pointer" data-go="inventory"><span class="k">Stock to reorder</span><span class="v num ${stock.length?"proj":""}">${S.inv.length?stock.length:"0"}</span><span class="s">${S.inv.length?(outN?outN+" out, ":"")+(stock.length-outN)+" below par":"Add items on the Inventory tab"}</span></button>
+  </div>
+  <div class="grid g21">
+    <div class="card"><div class="spread"><h3>Daily gross sales</h3><button class="link" data-go="forecast">See full forecast</button></div>
+      ${barChart(pts)}<div class="legend"><span><i style="background:var(--series)"></i>Sold</span><span><i style="background:var(--accent)"></i>Expected</span></div></div>
+    <div class="card"><div class="spread"><h3>Coming up</h3><button class="link" data-go="events">Schedule</button></div>
+      ${upcoming.length ? upcoming.map(e => { const m = eventMoney(e, days, S.settings, fc); return `<div style="padding:9px 0;border-top:1px solid var(--line)"><div class="spread"><b>${esc(e.name)}</b><span class="muted small">${fmtDay(e.date)}</span></div>
+        <div class="small muted">${esc(e.dj||"DJ not set")} &middot; costs ${money((+e.djFee||0)+(+e.otherCost||0))}</div>
+        <div class="small">${m.gross!=null?`Expected gross <b class="num">${money(m.gross)}</b>, net <b class="num ${m.net>=0?"pos":"neg"}">${money(m.net)}</b>`:""}</div></div>`; }).join("")
+        : `<div class="empty">No events scheduled yet. Add the next DJ night on the Events tab.</div>`}
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="spread"><h3>Top sellers, last 7 days</h3><button class="link" data-go="trends">All trends</button></div>
+      <div class="tablewrap"><table><tbody>${top.map(t=>`<tr><td>${esc(t[0])}</td><td class="r num">${t[1]} sold</td><td class="r num">${money(t[2])}</td></tr>`).join("")}</tbody></table></div></div>
+    <div class="card"><h3>Busiest hours, last 4 weeks</h3>
+      <p>Most of your sales land at <b>${bestH.map(hourLabel).join(", ")}</b>. Staff and stock the bar ahead of that window.</p>
+      <p class="muted small" style="margin-top:8px">Based on ${money(sum(hr))} in sales across 28 days.</p></div>
+  </div>`;
+}
+function banner(){
+  if(!S.db && S.loaded) return `<div class="banner"><span><b>Saving is off in this view.</b> Events and inventory can be entered but will not be kept. Open the page from claude.ai while signed in.</span></div>`;
+  if(S.slow) return `<div class="banner"><span><b>Still loading saved data.</b> It may be out of date until the connection answers.</span></div>`;
+  if(!SALES.live) return `<div class="banner"><span><b>Sales shown are sample data.</b> Events, costs and inventory below are yours and are saved.</span><button class="link" data-act="connect">How to connect Clover</button></div>`;
+  return "";
+}
+
+/* ============ reports ============ */
+const REPORTS = [["ledger","Weekly ledger"],["dow","Sales by day"],["items","Top items"],["events","Event nights"],["reorder","Reorder list"]];
+function toCSV(cols, rows){
+  const q = v => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  return [cols.map(c=>q(c.label)).join(","), ...rows.map(r => cols.map(c=>q(r[c.k])).join(","))].join("\n");
+}
+function weekRange(){ const from = key(addDays(weekStart(today), -7*S.weekBack)); return {from, to:key(addDays(parse(from),6))}; }
+function buildReport(){
+  const days = SALES.days(), fc = forecast(days, S.events, 14);
+  if(S.report === "ledger"){
+    const {from,to} = weekRange(), w = weekNet(days, from, to), by = w.rows;
+    const cols = [{k:"day",label:"Day"},{k:"gross",label:"Gross sales",r:1,f:money},{k:"tx",label:"Transactions",r:1},{k:"ticket",label:"Average ticket",r:1,f:v=>money(v,2)},{k:"ev",label:"Event"}];
+    const rows = by.map(d => { const e = S.events.find(x=>x.date===d.date); return {day:fmtDay(d.date), gross:d.gross, tx:d.tx, ticket:+(d.gross/d.tx).toFixed(2), ev:e?e.name+(e.dj?" with "+e.dj:""):""}; });
+    const ln = (a,b,cls="") => `<div class="ln"><span>${a}</span><span class="dots"></span><span class="num ${cls}">${b}</span></div>`;
+    const extra = `<div class="receipt"><div class="t">WEEKLY LEDGER</div><div class="sub">${fmtDay(from)} to ${fmtDay(to)}${S.weekBack===0?" (so far)":""}</div>
+      ${ln("Gross sales", money(w.gross))}${ln("Transactions", w.tx.toLocaleString("en-US"))}${ln("Average ticket", w.tx?money(w.gross/w.tx,2):"$0.00")}
+      <div style="height:8px"></div>
+      ${ln("Cost of goods ("+S.settings.cogsPct+"%)", "-"+money(w.cogs))}${ln("Labor ("+S.settings.laborPct+"%)", "-"+money(w.labor))}${ln("DJs and event costs", "-"+money(w.evc))}${S.settings.fixedWeek?ln("Fixed costs", "-"+money(w.fixed)):""}
+      <div class="ln tot"><span>NET ${w.net>=0?"PROFIT":"LOSS"}</span><span class="dots"></span><span class="num ${w.net>=0?"pos":"neg"}">${money(w.net)}</span></div></div>`;
+    return {cols, rows, extra, name:"weekly-ledger-"+from};
+  }
+  if(S.report === "dow"){
+    const by = weekdayStats(days, 8), tot = sum([0,1,2,3,4,5,6].map(w=>mean(by[w])));
+    const cols = [{k:"day",label:"Day"},{k:"avg",label:"Average gross",r:1,f:money},{k:"best",label:"Best",r:1,f:money},{k:"worst",label:"Slowest",r:1,f:money},{k:"share",label:"Share of week",r:1,f:v=>pct(v,0)}];
+    const rows = [1,2,3,4,5,6,0].map(w => ({day:DOWL[w], avg:Math.round(mean(by[w])), best:Math.max(...by[w]), worst:Math.min(...by[w]), share:mean(by[w])/tot}));
+    return {cols, rows, extra:`<p class="muted">Normal nights over the last 8 weeks. Event nights are left out so they do not inflate the averages.</p>`, name:"sales-by-day"};
+  }
+  if(S.report === "items"){
+    const a = itemTotals(days.slice(-28)), b = itemTotals(days.slice(-56,-28)), tr = sum(Object.entries(a).map(([n,q])=>q*priceOf(n)));
+    const cols = [{k:"item",label:"Item"},{k:"units",label:"Units, 28 days",r:1},{k:"rev",label:"Revenue",r:1,f:money},{k:"share",label:"Share",r:1,f:v=>pct(v,0)},{k:"chg",label:"Units vs prior 28",r:1,f:v=>(v>=0?"+":"")+pct(v,0)}];
+    const rows = Object.keys(a).map(n => ({item:n, units:a[n], rev:a[n]*priceOf(n), share:a[n]*priceOf(n)/tr, chg:b[n]?a[n]/b[n]-1:0})).sort((x,y)=>y.rev-x.rev);
+    return {cols, rows, extra:"", name:"top-items"};
+  }
+  if(S.report === "events"){
+    const past = S.events.filter(e=>e.date<TODAY).slice().reverse();
+    const cols = [{k:"date",label:"Date"},{k:"name",label:"Event"},{k:"dj",label:"DJ"},{k:"gross",label:"Gross",r:1,f:money},{k:"cost",label:"DJ + other costs",r:1,f:money},{k:"net",label:"Net for the night",r:1,f:v=>v==null?"":money(v)},{k:"paid",label:"Paid for itself",r:1,f:v=>v==null?"":moneyS(v)}];
+    const rows = past.map(e => { const m = eventMoney(e, days, S.settings, fc); return {date:e.date, name:e.name, dj:e.dj||"", gross:m.gross==null?"":Math.round(m.gross), cost:m.cost, net:m.net==null?null:Math.round(m.net), paid:m.paid==null?null:Math.round(m.paid)}; });
+    return {cols, rows, extra:`<p class="muted">"Paid for itself" is the extra sales over a normal night of that weekday, after cost of goods, minus the DJ and event costs.</p>`, name:"event-nights"};
+  }
+  const cols = [{k:"item",label:"Item"},{k:"cat",label:"Category"},{k:"onHand",label:"On hand",r:1},{k:"par",label:"Par",r:1},{k:"inc",label:"On order",r:1},{k:"need",label:"Order to reach par",r:1},{k:"cost",label:"Estimated cost",r:1,f:money}];
+  const rows = S.inv.map(i => ({i, need:Math.max(0, (+i.par||0)-(+i.onHand||0)-(+i.incomingQty||0))})).filter(x=>x.need>0)
+    .map(({i,need}) => ({item:i.name, cat:i.cat, onHand:+i.onHand||0, par:+i.par||0, inc:+i.incomingQty||0, need, cost:need*(+i.cost||0)}));
+  return {cols, rows, extra:rows.length?`<p class="muted">Estimated total: <b class="num">${money(sum(rows.map(r=>r.cost)))}</b></p>`:"", name:"reorder-list"};
+}
+function viewReports(){
+  const r = buildReport();
+  const tbl = r.rows.length ? `<div class="tablewrap"><table><thead><tr>${r.cols.map(c=>`<th class="${c.r?"r":""}">${esc(c.label)}</th>`).join("")}</tr></thead><tbody>${r.rows.map(row=>`<tr>${r.cols.map(c=>{ const v = row[c.k]; return `<td class="${c.r?"r num":""}">${esc(c.f ? c.f(v) : v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`
+    : `<div class="empty">${S.report==="reorder"?"Everything is at or above par.":S.report==="events"?"No past events yet. Add them on the Events tab.":"Nothing to show for this period."}</div>`;
+  return `
+  <div class="head rise"><div><h2>Reports</h2><p>Pick a report, then download it as a spreadsheet file. Costs use the percentages below, so set them to match your books.</p></div>
+    <button class="btn primary" data-act="csv">Download CSV</button></div>
+  ${banner()}
+  <div class="seg" role="group" aria-label="Report type">${REPORTS.map(([k,l])=>`<button aria-pressed="${S.report===k}" data-report="${k}">${l}</button>`).join("")}</div>
+  ${S.report==="ledger"?`<div class="seg" role="group" aria-label="Week" style="align-self:flex-start">${["This week","Last week","2 weeks ago","3 weeks ago"].map((l,i)=>`<button aria-pressed="${S.weekBack===i}" data-week="${i}">${l}</button>`).join("")}</div>`:""}
+  <div class="grid ${S.report==="ledger"?"g2":""}">
+    ${S.report==="ledger"?`<div>${r.extra}</div>`:""}
+    <div class="card">${S.report==="ledger"?"<h3>Day by day</h3>":`<h3>${REPORTS.find(x=>x[0]===S.report)[1]}</h3>`}${tbl}${S.report!=="ledger"?`<div style="margin-top:10px">${r.extra}</div>`:""}</div>
+  </div>
+  <div class="card"><h3>Cost assumptions</h3>
+    <div class="fgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div class="field"><label for="s-cogs">Cost of goods, % of sales</label><input id="s-cogs" type="number" min="0" max="100" step="0.5" value="${S.settings.cogsPct}" data-set="cogsPct"></div>
+      <div class="field"><label for="s-labor">Labor, % of sales</label><input id="s-labor" type="number" min="0" max="100" step="0.5" value="${S.settings.laborPct}" data-set="laborPct"></div>
+      <div class="field"><label for="s-fixed">Other fixed costs per week ($)</label><input id="s-fixed" type="number" min="0" step="10" value="${S.settings.fixedWeek}" data-set="fixedWeek"></div>
+    </div><p class="muted small" style="margin-top:10px">Rent, utilities and insurance can go in fixed costs. These are estimates until your real costs come from your books or Clover.</p></div>`;
+}
+
+/* ============ forecast ============ */
+function viewForecast(){
+  const days = SALES.days(), fc = forecast(days, S.events, 14), act = days.slice(-28).map(d=>({date:d.date, v:d.gross}));
+  const dayNet = f => { const c = costs(S.settings, f.mid), ec = f.event ? (+f.event.djFee||0)+(+f.event.otherCost||0) : 0; return f.mid - c.cogs - c.labor - ec - S.settings.fixedWeek/7; };
+  const f7 = sum(fc.slice(0,7).map(f=>f.mid)), f14 = sum(fc.map(f=>f.mid)), n7 = sum(fc.slice(0,7).map(dayNet));
+  const err = backtest(days), g = growthFactor(days), l7 = sum(days.slice(-7).map(d=>d.gross));
+  return `
+  <div class="head rise"><div><h2>Forecast</h2><p>What you should expect to make each night, based on the same weekday over the last 8 weeks, the 4-week trend, and any events you have scheduled.</p></div></div>
+  ${banner()}
+  <div class="grid g4">
+    <div class="card stat"><span class="k">Next 7 days</span><span class="v num proj">${money(f7)}</span><span class="s">${l7?(f7>=l7?"Up ":"Down ")+pct(Math.abs(f7/l7-1),0)+" vs the last 7 days":""}</span></div>
+    <div class="card stat"><span class="k">Next 14 days</span><span class="v num proj">${money(f14)}</span><span class="s">Gross sales</span></div>
+    <div class="card stat"><span class="k">Net next 7 days (est.)</span><span class="v num ${n7>=0?"pos":"neg"}">${money(n7)}</span><span class="s">After costs and scheduled events</span></div>
+    <div class="card stat"><span class="k">Recent miss</span><span class="v num">${err==null?"n/a":pct(err,0)}</span><span class="s">Average error on the last 4 weeks. ${g>1.005?"Trend: up "+pct(g-1,1)+".":g<.995?"Trend: down "+pct(1-g,1)+".":"Trend: flat."}</span></div>
+  </div>
+  <div class="card"><h3>Sold and expected</h3>${lineChart(act, fc)}
+    <div class="legend"><span><i style="background:var(--series)"></i>Sold</span><span><i style="background:var(--accent)"></i>Expected</span><span><i style="background:var(--accent);opacity:.25"></i>Likely range</span><span>Dots mark scheduled events</span></div></div>
+  <div class="card"><h3>Next 14 days</h3><div class="tablewrap"><table>
+    <thead><tr><th>Day</th><th>Event</th><th class="r">Expected gross</th><th class="r">Likely range</th><th class="r">Costs</th><th class="r">Expected net</th></tr></thead><tbody>
+    ${fc.map(f => { const n = dayNet(f), ec = f.event ? (+f.event.djFee||0)+(+f.event.otherCost||0) : 0, c = costs(S.settings, f.mid);
+      return `<tr><td>${fmtDay(f.date)}${f.date===TODAY?` <span class="pill warn">Today</span>`:""}</td><td>${f.event?esc(f.event.name)+(f.event.dj?`<span class="muted"> with ${esc(f.event.dj)}</span>`:""):`<span class="muted">None</span>`}</td>
+      <td class="r num"><b>${money(f.mid)}</b></td><td class="r num muted">${money(f.lo)} to ${money(f.hi)}</td><td class="r num">${money(c.cogs+c.labor+ec+S.settings.fixedWeek/7)}</td><td class="r num ${n>=0?"pos":"neg"}">${money(n)}</td></tr>`; }).join("")}
+    </tbody></table></div></div>
+  <div class="card"><h3>How the number is built</h3><p style="max-width:70ch">Each day starts from the average of that weekday over the last 8 weeks, then is scaled by how the last 4 weeks compare with the 4 before. A scheduled event lifts the day by the average bump your past events produced (${pct(eventUplift(days, S.events.filter(e=>e.date<TODAY))-1,0)} right now). The range is one standard step either side of that weekday's usual swing. Holidays and weather are not modeled, so treat big holiday weekends as a floor you can beat or miss.</p></div>`;
+}
+
+/* ============ trends ============ */
+const HCOLS = [16,17,18,19,20,21,22,23,0,1,2,3];
+function viewTrends(){
+  const days = SALES.days(), recent = days.slice(-56), order = [1,2,3,4,5,6,0];
+  const avgHW = (w, h) => { const rows = recent.filter(d => parse(d.date).getDay()===w); return mean(rows.map(d=>d.hourly[h])); };
+  let mx = 1; order.forEach(w => HCOLS.forEach(h => { mx = Math.max(mx, avgHW(w,h)); }));
+  const heat = `<div class="heat" style="grid-template-columns:44px repeat(${HCOLS.length},minmax(0,1fr))"><span></span>${HCOLS.map(h=>`<span class="lab hl">${hourLabel(h)}</span>`).join("")}
+    ${order.map(w => `<span class="lab">${DOW[w]}</span>` + HCOLS.map(h => { const v = avgHW(w,h), p = Math.round(v/mx*100);
+      return `<span class="cell" style="background:color-mix(in srgb,var(--heat1) ${p}%,var(--heat0));color:${p>50?"var(--bg)":"var(--ink)"}" title="${DOW[w]} ${hourLabel(h)}: about ${money(v)}">${v>=1?kfmt(v):""}</span>`; }).join("")).join("")}</div>`;
+  const sel = S.trendDay, selDays = sel==="all" ? recent : recent.filter(d => parse(d.date).getDay()===+sel);
+  const hv = HCOLS.map(h => mean(selDays.map(d=>d.hourly[h])));
+  const hp = HCOLS.map((h,i) => ({v:hv[i], kind:"act", l1:hourLabel(h), l2:"", tip:hourLabel(h)+": about "+money(hv[i])+" per night"}));
+  const top3 = HCOLS.map((h,i)=>[h,hv[i]]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
+  const near = (() => { const t = top3.slice().sort((a,b)=>((a+20)%24)-((b+20)%24)); return t.map(hourLabel).join(", "); })();
+  const wk = i => days.slice(-(i+1)*7, days.length-i*7);
+  const weeks = [11,10,9,8,7,6,5,4,3,2,1,0].map(wk);
+  const rows = MENU.map(m => {
+    const series = weeks.map(w => sum(w.map(d=>d.items[m.n]||0))), a = sum(series.slice(-4)), b = sum(series.slice(-8,-4)), ch = b ? a/b-1 : 0;
+    return {n:m.n, series, a, ch, rev:a*m.p};
+  }).sort((x,y)=>y.ch-x.ch);
+  return `
+  <div class="head rise"><div><h2>Trends</h2><p>When the bar is busiest and which drinks are gaining or losing ground.</p></div></div>
+  ${banner()}
+  <div class="card"><div class="spread"><h3>Busiest hours</h3><span class="muted small">Average sales per hour, last 8 weeks</span></div><div class="tablewrap">${heat}</div></div>
+  <div class="card"><div class="spread"><h3>Hour by hour</h3>
+    <div class="seg" role="group" aria-label="Day filter"><button aria-pressed="${sel==="all"}" data-tday="all">All</button>${order.map(w=>`<button aria-pressed="${sel==w}" data-tday="${w}">${DOW[w]}</button>`).join("")}</div></div>
+    ${barChart(hp)}<p style="margin-top:8px">${sel==="all"?"Across the week":"On "+DOWL[+sel]+"s"}, the money is made around <b>${near}</b>.</p></div>
+  <div class="card"><div class="spread"><h3>Drinks gaining and losing</h3><span class="muted small">Last 4 weeks vs the 4 before</span></div>
+    <div class="tablewrap"><table><thead><tr><th>Drink</th><th>12-week units</th><th class="r">Units, 4 weeks</th><th class="r">Change</th><th class="r">Revenue</th><th></th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.n)}</td><td>${spark(r.series)}</td><td class="r num">${r.a}</td><td class="r num ${r.ch>.02?"pos":r.ch<-.02?"neg":""}">${r.ch>=0?"+":""}${pct(r.ch,0)}</td><td class="r num">${money(r.rev)}</td>
+      <td>${r.ch>.08?`<span class="pill good">Rising</span>`:r.ch<-.08?`<span class="pill bad">Falling</span>`:`<span class="pill">Steady</span>`}</td></tr>`).join("")}
+    </tbody></table></div></div>`;
+}
+
+/* ============ events ============ */
+function viewEvents(){
+  const days = SALES.days(), fc = forecast(days, S.events, 14), m = S.month, first = new Date(m.getFullYear(), m.getMonth(), 1), start = addDays(first, -first.getDay());
+  const ml = ev => eventMoney(ev, days, S.settings, fc);
+  const in30 = S.events.filter(e => e.date>=TODAY && e.date<=key(addDays(today,30)));
+  const p30 = S.events.filter(e => e.date<TODAY && e.date>=key(addDays(today,-30))).map(e=>({e, m:ml(e)})).filter(x=>x.m.net!=null);
+  const paid = p30.filter(x => x.m.paid!=null && x.m.paid>=0).length;
+  let cells = "";
+  for(let i=0;i<42;i++){
+    const d = addDays(start,i), k = key(d), evs = S.events.filter(e=>e.date===k);
+    cells += `<div class="day ${d.getMonth()!==m.getMonth()?"out":""} ${k===TODAY?"today":""}" tabindex="0" role="button" data-cal="${k}" aria-label="${fmtDay(k)}${evs.length?", "+evs.map(e=>e.name).join(", "):", add event"}"><span class="dn">${d.getDate()}</span>
+      ${evs.map(e => { const x = ml(e), cl = e.date>=TODAY?"future":(x.net!=null&&x.net<0?"loss":""); return `<span class="chip ${cl}" data-ev="${esc(e.id)}" title="${esc(e.name)}">${esc(e.name)}${e.dj?" &middot; "+esc(e.dj):""}</span>`; }).join("")}</div>`;
+  }
+  const sorted = [...S.events.filter(e=>e.date>=TODAY), ...S.events.filter(e=>e.date<TODAY).reverse()];
+  const hasSamples = S.events.some(e=>e.sample);
+  return `
+  <div class="head rise"><div><h2>Events</h2><p>Schedule each night, who is DJing and what it costs. Gross comes from your sales for that date, and the net is after cost of goods, labor and the event costs.</p></div>
+    <div class="row">${hasSamples?`<button class="btn" data-act="clear-events">Remove sample events</button>`:""}<button class="btn primary" data-act="add-event">Add event</button></div></div>
+  ${banner()}
+  <div class="grid g4">
+    <div class="card stat"><span class="k">Events, next 30 days</span><span class="v num">${in30.length}</span><span class="s">${in30.length?"Costs "+money(sum(in30.map(e=>(+e.djFee||0)+(+e.otherCost||0)))):"Nothing scheduled"}</span></div>
+    <div class="card stat"><span class="k">Net from events, last 30 days</span><span class="v num ${sum(p30.map(x=>x.m.net))>=0?"pos":"neg"}">${money(sum(p30.map(x=>x.m.net)))}</span><span class="s">${p30.length} event night${p30.length===1?"":"s"}</span></div>
+    <div class="card stat"><span class="k">Paid for themselves</span><span class="v num">${p30.length?paid+" of "+p30.length:"n/a"}</span><span class="s">Extra sales beat the event costs</span></div>
+    <div class="card stat"><span class="k">DJ + event spend, last 30 days</span><span class="v num">${money(sum(p30.map(x=>x.m.cost)))}</span><span class="s">Across ${p30.length} night${p30.length===1?"":"s"}</span></div>
+  </div>
+  <div class="card"><div class="spread"><h3>${MON[m.getMonth()]} ${m.getFullYear()}</h3>
+    <div class="row"><button class="btn sm" data-act="month-prev" aria-label="Previous month">Previous</button><button class="btn sm" data-act="month-today">This month</button><button class="btn sm" data-act="month-next" aria-label="Next month">Next</button></div></div>
+    <div class="tablewrap"><div class="cal">${DOW.map(d=>`<span class="dow">${d}</span>`).join("")}${cells}</div></div>
+    <div class="legend"><span><i style="background:var(--accent-soft)"></i>Upcoming</span><span><i style="background:var(--series-soft)"></i>Made money</span><span><i style="background:var(--bad-soft)"></i>Lost money</span><span>Select a day to add an event, or an event to edit it.</span></div></div>
+  <div class="card"><h3>All events</h3>${sorted.length ? `<div class="tablewrap"><table><thead><tr><th>Date</th><th>Event</th><th>DJ</th><th class="r">Gross</th><th class="r">DJ + other</th><th class="r">Net</th><th class="r">Vs a normal night</th><th></th></tr></thead><tbody>
+    ${sorted.map(e => { const x = ml(e), up = e.date>=TODAY, tag = x.kind==="projected"?"expected":x.kind==="entered"?"entered":"";
+      return `<tr class="clickable" data-edit-ev="${esc(e.id)}"><td>${fmtDay(e.date)}</td><td>${esc(e.name)}${e.sample?` <span class="pill">Sample</span>`:""}</td><td>${esc(e.dj||"")}</td>
+      <td class="r num">${x.gross==null?`<span class="muted">No sales yet</span>`:money(x.gross)+(tag?` <span class="muted small">${tag}</span>`:"")}</td><td class="r num">${money(x.cost)}</td>
+      <td class="r num ${x.net==null?"":x.net>=0?"pos":"neg"}">${x.net==null?"":money(x.net)}</td>
+      <td class="r num">${x.paid==null?"":`<span class="${x.paid>=0?"pos":"neg"}">${moneyS(x.paid)}</span>`}</td>
+      <td>${up?`<span class="pill warn">Scheduled</span>`:x.net==null?"":x.net>=0?`<span class="pill good">Profit</span>`:`<span class="pill bad">Loss</span>`}</td></tr>`; }).join("")}
+    </tbody></table></div><p class="muted small" style="margin-top:10px">"Vs a normal night" is the extra sales over a typical night of that weekday, after cost of goods, minus the DJ and event costs. Green means the event paid for itself.</p>`
+    : `<div class="empty">No events yet. Add your first DJ night to see what it costs and what it brings in.</div>`}</div>`;
+}
+function openEvent(id, date){
+  const e = id ? S.events.find(x=>x.id===id) : null, v = e || {date:date||TODAY, name:"", dj:"", djFee:"", otherCost:"", gross:"", notes:""};
+  const ov = $("#overlay");
+  ov.innerHTML = `<div class="scrim" data-close="1"><form class="modal" id="evform" role="dialog" aria-modal="true" aria-labelledby="evt">
+    <div class="spread"><h3 id="evt">${e?"Edit event":"New event"}</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
+    <div class="fgrid">
+      <div class="field"><label for="f-date">Date</label><input id="f-date" type="date" required value="${esc(v.date)}"></div>
+      <div class="field"><label for="f-name">Event</label><input id="f-name" required placeholder="Latin Night" value="${esc(v.name)}"></div>
+      <div class="field"><label for="f-dj">DJ</label><input id="f-dj" placeholder="DJ name" value="${esc(v.dj||"")}"></div>
+      <div class="field"><label for="f-fee">DJ fee ($)</label><input id="f-fee" type="number" min="0" step="1" value="${esc(v.djFee??"")}"></div>
+      <div class="field"><label for="f-other">Other event costs ($)</label><input id="f-other" type="number" min="0" step="1" value="${esc(v.otherCost??"")}"></div>
+      <div class="field"><label for="f-gross">Gross sales ($), optional</label><input id="f-gross" type="number" min="0" step="1" value="${esc(v.gross??"")}"></div>
+      <div class="field full"><label for="f-notes">Notes</label><textarea id="f-notes" rows="2" placeholder="Promo, security, special pricing">${esc(v.notes||"")}</textarea></div>
+    </div>
+    <p class="muted small">Leave gross sales empty to use your sales for that date. Other costs can include security, promo, decorations and extra staff.</p>
+    <div class="spread"><div>${e?`<button type="button" class="btn danger" data-act="del-event" data-id="${esc(e.id)}">Delete event</button>`:""}</div><button class="btn primary" type="submit">Save event</button></div>
+  </form></div>`;
+  setTimeout(()=>{ const f = $("#f-name"); if(f) f.focus(); }, 30);
+  $("#evform").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const o = {date:$("#f-date").value, name:$("#f-name").value.trim(), dj:$("#f-dj").value.trim(), djFee:+$("#f-fee").value||0, otherCost:+$("#f-other").value||0, notes:$("#f-notes").value.trim()};
+    if($("#f-gross").value!=="") o.gross = +$("#f-gross").value;
+    if(!o.date || !o.name){ toast("Add a date and an event name."); return; }
+    const ok = await save("events/"+(e?e.id:newId("events")), o);
+    if(ok){ closeModal(); toast("Event saved"); }
+  });
+}
+
+/* ============ inventory ============ */
+function daysLeft(i){ const u = +i.usage||0; return u>0 ? (+i.onHand||0)/(u/7) : null; }
+function viewInventory(){
+  const cats = [...new Set(S.inv.map(i=>i.cat).filter(Boolean))].sort();
+  let list = S.inv.filter(i => S.invFilter==="all" ? true : S.invFilter==="low" ? invStatus(i)!=="ok" : i.cat===S.invFilter);
+  const val = sum(S.inv.map(i => (+i.onHand||0)*(+i.cost||0))), low = S.inv.filter(i=>invStatus(i)!=="ok").length;
+  const inc = S.inv.filter(i => (+i.incomingQty||0)>0), incVal = sum(inc.map(i => (+i.incomingQty||0)*(+i.cost||0)));
+  const hasSamples = S.inv.some(i=>i.sample);
+  const st = i => { const s = invStatus(i); return s==="out"?`<span class="pill bad">Out</span>`:s==="low"?`<span class="pill warn">Low</span>`:`<span class="pill good">OK</span>`; };
+  const level = i => { const pc = clamp((+i.onHand||0)/Math.max(1,+i.par||1)*100, 0, 100); return `<div class="bar ${invStatus(i)==="ok"?"":invStatus(i)}"><i style="width:${pc}%"></i></div>`; };
+  const stepper = i => `<span class="step"><button data-adj="${esc(i.id)}" data-d="-1" aria-label="One less ${esc(i.name)}">-</button><span>${+i.onHand||0}</span><button data-adj="${esc(i.id)}" data-d="1" aria-label="One more ${esc(i.name)}">+</button></span>`;
+  const dl = i => { const d = daysLeft(i); return d==null?`<span class="muted">n/a</span>`:`<span class="num ${d<4?"neg":d<8?"proj":""}">${d<1?"under 1":Math.round(d)} day${Math.round(d)===1?"":"s"}</span>`; };
+  const order = i => (+i.incomingQty||0)>0 ? `<span class="num">${+i.incomingQty}</span> <span class="muted small">${i.incomingDate?"on "+fmtDay(i.incomingDate):"date not set"}</span> <button class="link small" data-act="receive" data-id="${esc(i.id)}">Mark received</button>` : `<span class="muted">None</span>`;
+  const rows = list.map(i => `<tr><td><b>${esc(i.name)}</b>${i.sample?` <span class="pill">Sample</span>`:""}<div class="muted small">${esc(i.cat||"")}${i.unit?" &middot; "+esc(i.unit):""}</div></td>
+    <td>${stepper(i)}</td><td><div class="row" style="flex-wrap:nowrap;gap:8px"><span class="num small muted">${+i.par||0}</span>${level(i)}</div></td><td class="r">${dl(i)}</td><td>${order(i)}</td><td class="r num">${money((+i.onHand||0)*(+i.cost||0))}</td><td>${st(i)}</td>
+    <td><button class="btn sm" data-act="edit-item" data-id="${esc(i.id)}">Edit</button></td></tr>`).join("");
+  const cards = list.map(i => `<div class="card"><div class="spread"><b>${esc(i.name)}</b>${st(i)}</div><div class="muted small">${esc(i.cat||"")}${i.unit?" &middot; "+esc(i.unit):""}</div>
+    <div class="spread" style="margin-top:10px"><span>On hand ${stepper(i)}</span><span class="small">Par ${+i.par||0}</span></div><div style="margin-top:8px">${level(i)}</div>
+    <div class="small" style="margin-top:8px">Lasts ${dl(i)} &middot; On order: ${order(i)}</div><div style="margin-top:10px"><button class="btn sm" data-act="edit-item" data-id="${esc(i.id)}">Edit</button></div></div>`).join("");
+  return `
+  <div class="head rise"><div><h2>Inventory</h2><p>What is on the shelf and what is on the way. Use the plus and minus buttons for quick counts, and mark an order received when it arrives.</p></div>
+    <div class="row">${hasSamples?`<button class="btn" data-act="clear-inv">Remove sample items</button>`:""}<button class="btn primary" data-act="add-item">Add item</button></div></div>
+  ${banner()}
+  <div class="grid g4">
+    <div class="card stat"><span class="k">Items tracked</span><span class="v num">${S.inv.length}</span><span class="s">${cats.length} categor${cats.length===1?"y":"ies"}</span></div>
+    <div class="card stat"><span class="k">Stock on hand, at cost</span><span class="v num">${money(val)}</span><span class="s">On hand times cost per unit</span></div>
+    <div class="card stat"><span class="k">Below par</span><span class="v num ${low?"proj":""}">${low}</span><span class="s">${S.inv.filter(i=>invStatus(i)==="out").length} completely out</span></div>
+    <div class="card stat"><span class="k">On order</span><span class="v num">${inc.length}</span><span class="s">${money(incVal)} arriving</span></div>
+  </div>
+  <div class="seg" role="group" aria-label="Filter" style="align-self:flex-start">${[["all","All"],["low","Needs attention"],...cats.map(c=>[c,c])].map(([k,l])=>`<button aria-pressed="${S.invFilter===k}" data-filter="${esc(k)}">${esc(l)}</button>`).join("")}</div>
+  ${list.length ? `<div class="card tbl-inv"><div class="tablewrap"><table><thead><tr><th>Item</th><th>On hand</th><th>Level vs par</th><th class="r">Lasts about</th><th>On order</th><th class="r">Value</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div><div class="cards">${cards}</div>`
+    : `<div class="empty">${S.inv.length?"No items match this filter.":"No inventory yet. Add the bottles, kegs and cases you stock, with a par level for each."}</div>`}
+  <p class="muted small">"Lasts about" uses the weekly usage you enter on each item. Once Clover sales are connected, usage can be worked out from sales.</p>`;
+}
+function openItem(id){
+  const i = id ? S.inv.find(x=>x.id===id) : null, v = i || {name:"", cat:"Beer", unit:"", onHand:0, par:0, cost:"", usage:"", incomingQty:"", incomingDate:""};
+  const cats = [...new Set(["Beer","Liquor","Mixers","Supplies",...S.inv.map(x=>x.cat).filter(Boolean)])];
+  $("#overlay").innerHTML = `<div class="scrim" data-close="1"><form class="modal" id="itform" role="dialog" aria-modal="true" aria-labelledby="itt">
+    <div class="spread"><h3 id="itt">${i?"Edit item":"New item"}</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
+    <div class="fgrid">
+      <div class="field full"><label for="i-name">Item</label><input id="i-name" required placeholder="Corona Extra" value="${esc(v.name)}"></div>
+      <div class="field"><label for="i-cat">Category</label><input id="i-cat" list="i-cats" value="${esc(v.cat||"")}"><datalist id="i-cats">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
+      <div class="field"><label for="i-unit">Counted as</label><input id="i-unit" placeholder="case of 24, 750 ml bottle, half keg" value="${esc(v.unit||"")}"></div>
+      <div class="field"><label for="i-on">On hand</label><input id="i-on" type="number" min="0" step="1" value="${esc(v.onHand??0)}"></div>
+      <div class="field"><label for="i-par">Par level (keep at least)</label><input id="i-par" type="number" min="0" step="1" value="${esc(v.par??0)}"></div>
+      <div class="field"><label for="i-cost">Cost per unit ($)</label><input id="i-cost" type="number" min="0" step="0.01" value="${esc(v.cost??"")}"></div>
+      <div class="field"><label for="i-use">Used per week</label><input id="i-use" type="number" min="0" step="0.5" value="${esc(v.usage??"")}"></div>
+      <div class="field"><label for="i-inc">On order (units)</label><input id="i-inc" type="number" min="0" step="1" value="${esc(v.incomingQty??"")}"></div>
+      <div class="field"><label for="i-incd">Arrives on</label><input id="i-incd" type="date" value="${esc(v.incomingDate||"")}"></div>
+    </div>
+    <div class="spread"><div>${i?`<button type="button" class="btn danger" data-act="del-item" data-id="${esc(i.id)}">Delete item</button>`:""}</div><button class="btn primary" type="submit">Save item</button></div>
+  </form></div>`;
+  setTimeout(()=>{ const f = $("#i-name"); if(f) f.focus(); }, 30);
+  $("#itform").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const o = {name:$("#i-name").value.trim(), cat:$("#i-cat").value.trim()||"Other", unit:$("#i-unit").value.trim(), onHand:+$("#i-on").value||0, par:+$("#i-par").value||0, cost:+$("#i-cost").value||0, usage:+$("#i-use").value||0, incomingQty:+$("#i-inc").value||0, incomingDate:$("#i-incd").value};
+    if(!o.name){ toast("Give the item a name."); return; }
+    const ok = await save("inventory/"+(i?i.id:newId("inventory")), o);
+    if(ok){ closeModal(); toast("Item saved"); }
+  });
+}
+function openConnect(){
+  $("#overlay").innerHTML = `<div class="scrim" data-close="1"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="ct">
+    <div class="spread"><h3 id="ct">Connect Clover</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
+    <p>Browsers block a page like this from calling Clover directly, and your API token must never sit in a web page. So live sales come through a small server that holds the token and passes your sales to this page.</p>
+    <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
+      <li>Keep your Merchant ID and read-only API token in the server's environment settings.</li>
+      <li>The server reads orders with line items and payments from Clover's v3 API and returns one record per day: date, gross, transactions, sales per hour and units per item.</li>
+      <li>This page swaps its sample sales for that feed. Reports, forecast and trends then use your real numbers with no other changes.</li>
+    </ol>
+    <p class="muted small">Never paste your token into this page or into chat.</p></div></div>`;
+}
+function closeModal(){ $("#overlay").innerHTML = ""; }
+
+/* ============ render + events ============ */
+const VIEWS = {overview:viewOverview, reports:viewReports, forecast:viewForecast, trends:viewTrends, events:viewEvents, inventory:viewInventory};
+function focusSig(){
+  const a = document.activeElement; if(!a || a===document.body || !a.getAttributeNames) return null;
+  const at = a.getAttributeNames().filter(n => n.startsWith("data-") || n==="id").map(n => `[${n}="${CSS.escape(a.getAttribute(n))}"]`);
+  return at.length ? a.tagName.toLowerCase()+at.join("") : null;
+}
+function render(){
+  const sig = focusSig();
+  $("#tabs").innerHTML = TABS.map(([k,l]) => {
+    let b = ""; if(k==="inventory"){ const n = S.inv.filter(i=>invStatus(i)!=="ok").length; if(n) b = `<span class="badge">${n}</span>`; }
+    if(k==="events"){ const n = S.events.filter(e=>e.date>=TODAY && e.date<=key(addDays(today,7))).length; if(n) b = `<span class="badge">${n}</span>`; }
+    return `<button class="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}${b}</button>`;
+  }).join("");
+  try { $("#main").innerHTML = VIEWS[S.tab](); }
+  catch(e){ $("#main").innerHTML = `<div class="empty">This section could not be drawn. Reload the page and try again.</div>`; console.error(e); }
+  if(sig){ try { const el = $(sig); if(el && !$("#overlay").firstChild) el.focus({preventScroll:true}); } catch(e){} }
+}
+const pending = {};
+function queueInv(id){
+  clearTimeout(pending[id]);
+  pending[id] = setTimeout(async () => {
+    const i = S.inv.find(x=>x.id===id); if(!i) return;
+    const {id:_, ...rest} = i; await save("inventory/"+id, rest);
+  }, 500);
+}
+async function clearSamples(col, list){
+  for(const x of list.filter(x=>x.sample)) await remove(col+"/"+x.id);
+  toast("Sample rows removed");
+}
+document.addEventListener("click", async ev => {
+  const t = ev.target;
+  if(t.closest("[data-close]") && (t.matches(".scrim") || t.closest("button[data-close]"))){ closeModal(); return; }
+  let el;
+  if((el = t.closest("[data-tab],[data-go]"))){ S.tab = el.dataset.tab || el.dataset.go; render(); window.scrollTo(0,0); return; }
+  if((el = t.closest("[data-report]"))){ S.report = el.dataset.report; render(); return; }
+  if((el = t.closest("[data-week]"))){ S.weekBack = +el.dataset.week; render(); return; }
+  if((el = t.closest("[data-tday]"))){ S.trendDay = el.dataset.tday; render(); return; }
+  if((el = t.closest("[data-filter]"))){ S.invFilter = el.dataset.filter; render(); return; }
+  if((el = t.closest("[data-adj]"))){
+    const i = S.inv.find(x=>x.id===el.dataset.adj); if(!i) return;
+    i.onHand = Math.max(0, (+i.onHand||0) + (+el.dataset.d)); render(); queueInv(i.id); return;
+  }
+  if((el = t.closest("[data-ev]"))){ openEvent(el.dataset.ev); return; }
+  if((el = t.closest("[data-edit-ev]"))){ openEvent(el.dataset.editEv); return; }
+  if((el = t.closest("[data-cal]"))){ openEvent(null, el.dataset.cal); return; }
+  if((el = t.closest("[data-act]"))){
+    const a = el.dataset.act, id = el.dataset.id;
+    if(a==="connect") openConnect();
+    else if(a==="add-event") openEvent(null, TODAY);
+    else if(a==="add-item") openItem(null);
+    else if(a==="edit-item") openItem(id);
+    else if(a==="month-prev") { S.month = new Date(S.month.getFullYear(), S.month.getMonth()-1, 1); render(); }
+    else if(a==="month-next") { S.month = new Date(S.month.getFullYear(), S.month.getMonth()+1, 1); render(); }
+    else if(a==="month-today") { S.month = new Date(today.getFullYear(), today.getMonth(), 1); render(); }
+    else if(a==="receive"){
+      const i = S.inv.find(x=>x.id===id); if(!i) return;
+      const {id:_, ...rest} = i; rest.onHand = (+rest.onHand||0) + (+rest.incomingQty||0); rest.incomingQty = 0; rest.incomingDate = "";
+      if(await save("inventory/"+id, rest)) toast("Delivery added to stock");
+    }
+    else if(a==="del-event"){ if(await remove("events/"+id)){ closeModal(); toast("Event deleted"); } }
+    else if(a==="del-item"){ if(await remove("inventory/"+id)){ closeModal(); toast("Item deleted"); } }
+    else if(a==="clear-events") clearSamples("events", S.events);
+    else if(a==="clear-inv") clearSamples("inventory", S.inv);
+    else if(a==="csv"){
+      const r = buildReport(), dl = await (window.claude && window.claude.use ? window.claude.use("downloads").catch(()=>null) : null);
+      if(!dl){ toast("Downloads are not available in this view."); return; }
+      try { await dl.save({filename:r.name+".csv", data:toCSV(r.cols, r.rows)}); toast("Report saved"); } catch(e){ if(e && e.code!=="declined") toast("Could not save the file."); }
+    }
+  }
+});
+document.addEventListener("keydown", ev => {
+  if(ev.key==="Escape" && $("#overlay").firstChild) closeModal();
+  if((ev.key==="Enter"||ev.key===" ") && ev.target.matches && ev.target.matches(".day[data-cal]")){ ev.preventDefault(); openEvent(null, ev.target.dataset.cal); }
+});
+document.addEventListener("change", async ev => {
+  const el = ev.target.closest && ev.target.closest("[data-set]"); if(!el) return;
+  const v = Math.max(0, +el.value || 0), k = el.dataset.set;
+  S.settings = {...S.settings, [k]: k==="fixedWeek" ? v : Math.min(100, v)};
+  render(); await save("settings/main", S.settings);
+});
+render();
+initStore();
+</script>
+</body>
+</html>
