@@ -67,9 +67,14 @@ async function fetchOrders(fromMs, toMs) {
   return out;
 }
 const COUNTED = new Set(["PAID", "PARTIALLY_PAID", "PARTIALLY_REFUNDED"]);
+/* Clover can leave paymentState as OPEN on orders that were paid by card (they become "locked"), so a locked order counts too.
+   Refunded, voided and still-open tabs do not. */
+const tally = {};
+const isPaid = o => COUNTED.has(o.paymentState) || (o.paymentState === "OPEN" && o.state === "locked") || !o.paymentState;
 function emptyDay(date) { return { date, gross: 0, tx: 0, hourly: Array(24).fill(0), items: {} }; }
 function addOrder(days, prices, o) {
-  if (o.paymentState && !COUNTED.has(o.paymentState)) return;
+  tally[(o.paymentState || "none") + " / " + (o.state || "none")] = (tally[(o.paymentState || "none") + " / " + (o.state || "none")] || 0) + 1;
+  if (!isPaid(o)) return;
   const ms = +o.createdTime; if (!ms) return;
   const date = bizDate(ms), d = days[date]; if (!d) return;
   const dollars = (+o.total || 0) / 100;
@@ -188,7 +193,7 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify(salesPayload()));
   }
   if (p === "/api/diagnose") { // signed-in only: shows what Clover returns, with no customer details
-    const out = { status: cache.status, message: cache.message, timezone: TZ, now: Date.now(), daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length };
+    const out = { status: cache.status, message: cache.message, timezone: TZ, now: Date.now(), daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length, orderTally: tally };
     try {
       const m = await cloverGet("/v3/merchants/" + encodeURIComponent(MID));
       out.merchantName = m && m.name;
