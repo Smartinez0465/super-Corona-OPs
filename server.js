@@ -187,6 +187,19 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
     return res.end(JSON.stringify(salesPayload()));
   }
+  if (p === "/api/diagnose") { // signed-in only: shows what Clover returns, with no customer details
+    const out = { status: cache.status, message: cache.message, timezone: TZ, now: Date.now(), daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length };
+    try {
+      const m = await cloverGet("/v3/merchants/" + encodeURIComponent(MID));
+      out.merchantName = m && m.name;
+    } catch (e) { out.merchantError = e.message; }
+    try {
+      const o = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/orders?orderBy=" + encodeURIComponent("createdTime DESC") + "&limit=5");
+      out.latestOrders = ((o && o.elements) || []).map(x => ({ createdTime: x.createdTime, createdAt: x.createdTime ? new Date(+x.createdTime).toISOString() : null, paymentState: x.paymentState, state: x.state, total: x.total }));
+    } catch (e) { out.ordersError = e.message; }
+    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+    return res.end(JSON.stringify(out, null, 2));
+  }
   if (p === "/" || p === "/index.html") return serveFile(res, path.join(PUBLIC_DIR, "index.html"), { "Cache-Control": "no-cache" });
   res.writeHead(404, { "Content-Type": "text/plain" }); res.end("Not found");
 });
