@@ -142,14 +142,6 @@ tbody tr.clickable:hover{background:var(--surface2)}
 .bar i{display:block;height:100%;background:var(--series);border-radius:99px}
 .bar.low i{background:var(--accent)} .bar.out i{background:var(--bad)}
 .cards{display:none}
-.plain ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:18.5px;line-height:1.45;max-width:72ch}
-.plain{border-left:5px solid var(--accent)}
-.help{background:var(--surface);border:1px solid var(--line);border-radius:12px}
-.help summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:16.5px;list-style:none;display:flex;gap:10px;align-items:center;min-height:48px}
-.help summary::-webkit-details-marker{display:none}
-.help summary::before{content:"?";display:inline-grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:15px}
-.help[open] summary{border-bottom:1px solid var(--line)}
-.help ul{margin:0;padding:14px 18px 16px 40px;display:flex;flex-direction:column;gap:8px;max-width:72ch}
 @media (max-width:980px){
   .g4{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(2,minmax(0,1fr))} .g21{grid-template-columns:minmax(0,1fr)}
 }
@@ -161,7 +153,6 @@ tbody tr.clickable:hover{background:var(--surface2)}
   .railnote{display:none}
   .stat .v{font-size:42px}
   h2{font-size:32px}
-  .plain ul{font-size:17.5px}
   .tbl-inv{display:none} .cards{display:flex;flex-direction:column;gap:10px}
 }
 @media (max-width:560px){
@@ -745,32 +736,6 @@ function itemTotals(days){
 }
 const priceOf = n => SALES.prices[n] || 0;
 
-/* ============ small shared pieces ============ */
-function help(tab, items){
-  return `<details class="help" data-help="${tab}" ${S.help[tab]?"open":""}><summary>${t("What am I looking at?")}</summary><ul>${items.map(i=>`<li>${t(i)}</li>`).join("")}</ul></details>`;
-}
-function plainSummary(days, fc, stock){
-  const out = [], y = days[days.length-1];
-  if(y){
-    const w = parse(y.date).getDay(), usual = mean(weekdayStats(days.slice(0,-1), 8)[w]), dn = DOWL[w];
-    if(y.gross <= 0) out.push(t("No sales were recorded yesterday ({day}).", {day:dn}));
-    else if(usual > 0){
-      const d = y.gross/usual - 1, a = money(y.gross), u = money(usual);
-      if(Math.abs(d) < .05) out.push(t("Yesterday ({day}) the bar sold {amt}. That is about a normal {day}.", {day:dn, amt:a}));
-      else if(d > 0) out.push(t("Yesterday ({day}) the bar sold {amt}. That is {p} more than a normal {day} (about {usual}).", {day:dn, amt:a, p:pct(d,0), usual:u}));
-      else out.push(t("Yesterday ({day}) the bar sold {amt}. That is {p} less than a normal {day} (about {usual}).", {day:dn, amt:a, p:pct(-d,0), usual:u}));
-    } else out.push(t("Yesterday ({day}) the bar sold {amt}.", {day:dn, amt:money(y.gross)}));
-  }
-  const f7 = sum(fc.slice(0,7).map(f=>f.mid));
-  if(f7 > 0) out.push(t("Over the next 7 days we expect about {amt} in sales.", {amt:money(f7)}));
-  const nx = S.events.filter(e=>e.date>=TODAY)[0];
-  if(nx) out.push(t("Next event: {name} on {day}.", {name:nx.name, day:fmtDay(nx.date)}));
-  if(!S.inv.length) out.push(t("Add your stock on the Inventory tab to get reorder reminders."));
-  else if(stock.length) out.push(pl(stock.length, "{n} item needs to be reordered.", "{n} items need to be reordered."));
-  else out.push(t("Nothing needs to be reordered right now."));
-  return out;
-}
-
 /* ============ overview ============ */
 function viewOverview(){
   const days = SALES.days(), last7 = days.slice(-7), prev7 = days.slice(-14,-7);
@@ -784,13 +749,10 @@ function viewOverview(){
   const tot = itemTotals(last7), top = Object.entries(tot).map(([n,q])=>[n,q,q*priceOf(n)]).sort((x,y)=>y[2]-x[2]).slice(0,5);
   const hr = Array(24).fill(0); days.slice(-28).forEach(d => d.hourly.forEach((v,h)=>{ hr[h]+=v; }));
   const bestH = hr.map((v,h)=>[h,v]).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>x[0]).sort((a,b)=>((a+20)%24)-((b+20)%24));
-  const lines = plainSummary(days, fc, stock);
   return `
   <div class="head rise"><div><h2>${cap(DOWL[today.getDay()])}, ${longDate(today)}</h2>
     <p>${t("A quick look at the last 7 days, the week ahead, and what needs your attention.")}</p></div></div>
   ${banner()}
-  <div class="card plain"><h3>${t("In plain words")}</h3><ul>${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></div>
-  ${help("overview", ["Total sales is everything rung up on Clover, before any costs are taken out.", "Profit after costs is an estimate: sales minus the cost of drinks, staff pay and event costs. You can change those percentages on the Reports tab.", "Orange means a guess about the future, or something that needs your attention."])}
   <div class="grid g4">
     <div class="card stat"><span class="k">${t("Total sales, last 7 days")}</span><span class="v num">${money(g7)}</span><span class="s ${ch>=0?"pos":"neg"}">${ch>=0?t("Up {p} compared with the 7 days before",{p:pct(Math.abs(ch),0)}):t("Down {p} compared with the 7 days before",{p:pct(Math.abs(ch),0)})}</span></div>
     <div class="card stat"><span class="k">${t("Expected sales, next 7 days")}</span><span class="v num proj">${money(f7)}</span><span class="s">${t("A guess based on your usual weekly pattern, the recent trend and any events")}</span></div>
@@ -880,7 +842,6 @@ function viewReports(){
   <div class="head rise"><div><h2>${t("Reports")}</h2><p>${t("Pick a report, then download it as a spreadsheet file. Costs use the percentages at the bottom of this page, so set them to match your books.")}</p></div>
     <button class="btn primary" data-act="csv">${t("Download spreadsheet")}</button></div>
   ${banner()}
-  ${help("reports", ["Pick a report from the buttons below. The table updates right away.", "Tap Download spreadsheet to save the report as a CSV file that opens in Excel or Google Sheets.", "Profit numbers use the cost percentages at the bottom of this page. Change them to match your real costs."])}
   <div class="seg" role="group" aria-label="${t("Report type")}">${REPORTS.map(([k,l])=>`<button aria-pressed="${S.report===k}" data-report="${k}">${t(l)}</button>`).join("")}</div>
   ${S.report==="ledger"?`<div class="seg" role="group" aria-label="${t("Week")}" style="align-self:flex-start">${["This week","Last week","2 weeks ago","3 weeks ago"].map((l,i)=>`<button aria-pressed="${S.weekBack===i}" data-week="${i}">${t(l)}</button>`).join("")}</div>`:""}
   <div class="grid ${S.report==="ledger"?"g2":""}">
@@ -905,7 +866,6 @@ function viewForecast(){
   return `
   <div class="head rise"><div><h2>${t("Forecast")}</h2><p>${t("What you can expect to make each night. It looks at the same day of the week over the last 8 weeks, the recent trend, and any events you scheduled.")}</p></div></div>
   ${banner()}
-  ${help("forecast", ["The forecast is a smart guess, not a promise.", "It starts from what you usually make on that day of the week, then adjusts for whether sales have been going up or down lately.", "Days with a scheduled event get a boost, based on how your past events did.", "The shaded band on the chart is the range we think is likely. Holidays and weather are not included."])}
   <div class="grid g4">
     <div class="card stat"><span class="k">${t("Next 7 days")}</span><span class="v num proj">${money(f7)}</span><span class="s">${l7?(f7>=l7?t("Up {p} compared with the last 7 days",{p:pct(Math.abs(f7/l7-1),0)}):t("Down {p} compared with the last 7 days",{p:pct(Math.abs(f7/l7-1),0)})):""}</span></div>
     <div class="card stat"><span class="k">${t("Next 14 days")}</span><span class="v num proj">${money(f14)}</span><span class="s">${t("Total sales")}</span></div>
@@ -946,7 +906,6 @@ function viewTrends(){
   return `
   <div class="head rise"><div><h2>${t("Trends")}</h2><p>${t("When the bar is busiest, and which drinks are selling more or less than before.")}</p></div></div>
   ${banner()}
-  ${help("trends", ["In the hour chart, a darker square means more sales in that hour.", "Hours go from 4 pm to 3 am. Find your busiest day and hour to plan staff and stock.", "The drinks table compares the last 4 weeks with the 4 weeks before, so you can see what is selling more or less."])}
   <div class="card"><div class="spread"><h3>${t("Busiest hours")}</h3><span class="muted small">${t("Average sales per hour, last 8 weeks")}</span></div><div class="tablewrap">${heat}</div></div>
   <div class="card"><div class="spread"><h3>${t("Hour by hour")}</h3>
     <div class="seg" role="group" aria-label="${t("Day filter")}"><button aria-pressed="${sel==="all"}" data-tday="all">${t("All")}</button>${order.map(w=>`<button aria-pressed="${sel==w}" data-tday="${w}">${cap(DOW[w])}</button>`).join("")}</div></div>
@@ -978,7 +937,6 @@ function viewEvents(){
   <div class="head rise"><div><h2>${t("Events")}</h2><p>${t("Schedule each night, who is DJing and what it costs. Sales come from your Clover sales for that date. Profit is sales minus drinks cost, staff pay and the event costs.")}</p></div>
     <div class="row">${hasSamples?`<button class="btn" data-act="clear-events">${t("Remove sample events")}</button>`:""}<button class="btn primary" data-act="add-event">${t("Add event")}</button></div></div>
   ${banner()}
-  ${help("events", ["Tap Add event, or tap any day on the calendar, to schedule a night with the DJ and what it costs.", "Profit for the night is sales minus the cost of drinks, staff pay, and the DJ and event costs.", "On the calendar, green means the night made money and red means it lost money. Orange is coming up.", "Worth it? tells you if the event brought in more than a normal night would have, after its costs."])}
   <div class="grid g4">
     <div class="card stat"><span class="k">${t("Events in the next 30 days")}</span><span class="v num">${in30.length}</span><span class="s">${in30.length?t("Costs {amt}",{amt:money(sum(in30.map(e=>(+e.djFee||0)+(+e.otherCost||0))))}):t("Nothing scheduled")}</span></div>
     <div class="card stat"><span class="k">${t("Profit from events, last 30 days")}</span><span class="v num ${netSum>=0?"pos":"neg"}">${money(netSum)}</span><span class="s">${pl(p30.length,"{n} event night","{n} event nights")}</span></div>
@@ -1050,7 +1008,6 @@ function viewInventory(){
   <div class="head rise"><div><h2>${t("Inventory")}</h2><p>${t("What is on the shelf and what is on the way. Use the plus and minus buttons for quick counts, and tap Mark received when an order arrives.")}</p></div>
     <div class="row">${hasSamples?`<button class="btn" data-act="clear-inv">${t("Remove sample items")}</button>`:""}<button class="btn primary" data-act="add-item">${t("Add item")}</button></div></div>
   ${banner()}
-  ${help("inventory", ["Use + and - to update a count in seconds. It saves by itself.", "Keep at least is the smallest amount you want on hand. When the count drops below it, the item shows as Low.", "When an order is on the way, enter how many and when. Tap Mark received when it arrives and the stock count goes up.", "Items that need attention are collected in the Needs attention filter and on the Reports tab as a shopping list."])}
   <div class="grid g4">
     <div class="card stat"><span class="k">${t("Items tracked")}</span><span class="v num">${S.inv.length}</span><span class="s">${pl(cats.length,"{n} category","{n} categories")}</span></div>
     <div class="card stat"><span class="k">${t("Value of stock on hand")}</span><span class="v num">${money(val)}</span><span class="s">${t("What you paid for what is on the shelf")}</span></div>
@@ -1196,7 +1153,6 @@ document.addEventListener("click", async ev => {
     }
   }
 });
-document.addEventListener("toggle", ev => { const d = ev.target; if(d && d.matches && d.matches("details[data-help]")) S.help[d.dataset.help] = d.open; }, true);
 document.addEventListener("keydown", ev => {
   if(ev.key==="Escape" && $("#overlay").firstChild) closeModal();
   if((ev.key==="Enter"||ev.key===" ") && ev.target.matches && ev.target.matches(".day[data-cal]")){ ev.preventDefault(); openEvent(null, ev.target.dataset.cal); }
