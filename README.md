@@ -1,31 +1,40 @@
 # Super Korona Ops
 
-A single-page dashboard for the bar: sales reports, a forecast, busy-hour and drink trends, event and DJ scheduling with profit and loss, and inventory.
+Sales reports, a 14-day forecast, busy-hour and drink trends, event and DJ scheduling with profit and loss, and inventory, for the bar. It reads your sales from Clover through a small server, and installs on a phone like an app.
 
-Open `index.html` in a browser to see it. No build step.
+There is nothing to install: the server uses only what comes with Node.js 20 or newer.
 
-## Sections
+## Run it on your computer
 
-- **Overview**: last 7 days, expected next 7 days, estimated net, items to reorder.
-- **Reports**: weekly ledger, sales by day, top items, event nights, reorder list. CSV download.
-- **Forecast**: next 14 days from the same weekday over the last 8 weeks, scaled by the 4-week trend and any scheduled events.
-- **Trends**: day-by-hour heat map and rising or falling drinks.
-- **Events**: calendar plus a list with DJ fee, other costs, gross, net, and whether the night paid for itself.
-- **Inventory**: on hand, par level, days left, and what is on order.
+1. In Clover, create a read-only API token (Orders, Payments, Inventory). Find your Merchant ID in the dashboard URL.
+2. Copy `.env.example` to `.env` and fill in the three values. `APP_PASSWORD` is a password you choose for the dashboard.
+3. Run `npm run dev` (or `node --env-file=.env server.js`) and open http://localhost:3000.
 
-## Current state
+`.env` is in `.gitignore`. Never commit it, and never paste the token into the page or into chat.
 
-- Sales are **sample data**, generated in `sampleSales()`. Nothing here talks to Clover yet.
-- The page was built to run inside a claude.ai artifact, which provides saved storage for events, inventory and cost settings. Opened as a plain file, those sections start empty and cannot be saved.
+## Put it online with Render
 
-## Connecting Clover
+1. Create a Render account and choose New, then Web Service, and connect this GitHub repo.
+2. Runtime: Node. Start command: `npm start`. Instance type: Free is enough to start.
+3. In the service's Environment settings, add `CLOVER_API_TOKEN`, `CLOVER_MERCHANT_ID`, `APP_PASSWORD` and, if needed, `TIMEZONE`.
+4. Deploy. Render gives you a link. Open it, sign in with `APP_PASSWORD`, and wait for the first Clover load (about a minute).
 
-A browser page cannot call Clover directly, and an API token must never be placed in front-end code. The plan:
+Pushing to `main` redeploys. On the free plan the service sleeps after 15 minutes without visitors, so the first open after a break is slow and the Clover load restarts.
 
-1. Create a read-only API token in the Clover dashboard (Orders, Payments, Inventory).
-2. Put the token and Merchant ID in a `.env` file on a small server (for example a Netlify function). `.env` is already in `.gitignore`.
-3. The server reads orders with line items from Clover's v3 API and returns one record per day:
-   `{ date, gross, tx, hourly: [24 numbers], items: { "Item name": units } }`
-4. Replace `sampleSales()` in `index.html` with a fetch to that server.
+## Install on your phone
 
-Do not commit tokens or merchant IDs to this repository.
+- **iPhone:** open the link in Safari, tap Share, then Add to Home Screen.
+- **Android:** open the link in Chrome, then use the menu and choose Install app or Add to Home screen.
+
+## How the numbers work
+
+- Sales come from Clover orders. Orders that are open, refunded or credited are left out. A "business day" runs from 6am to 6am in `TIMEZONE`, so sales after midnight count toward the night before.
+- Check yesterday's total here against Clover's own sales report the first time. If gross is off (for example, tax or tips handled differently), tell whoever maintains this so `server.js` can be adjusted.
+- Cost of goods, labor and fixed costs are percentages you set on the Reports tab. They are estimates until they match your books.
+- Events, costs and inventory are saved in the browser on the device you use. They do not sync between phone and computer yet.
+
+## Files
+
+- `server.js`: login, Clover sales feed, serves the page.
+- `public/index.html`: the dashboard.
+- `public/manifest.webmanifest`, `public/sw.js`, icons: phone install.

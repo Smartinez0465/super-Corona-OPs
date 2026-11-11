@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0C1A16">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Korona Ops">
 <title>Super Korona Ops</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,7 +163,7 @@ tbody tr.clickable:hover{background:var(--surface2)}
   <aside class="rail">
     <div class="brand">Super Korona<small>Sales, nights and stock</small></div>
     <nav class="tabs" id="tabs" aria-label="Sections"></nav>
-    <div class="railnote">Sales figures are sample data until Clover is connected. Events, costs and inventory you enter are saved.</div>
+    <div class="railnote">Events, costs and inventory you enter are saved on this device. <a class="link" href="/logout">Sign out</a></div>
   </aside>
   <main class="main" id="main" aria-live="polite"></main>
 </div>
@@ -229,7 +236,19 @@ function sampleSales(){
   }
   return out;
 }
-const SALES = { _d:null, days(){ return this._d || (this._d = sampleSales()); }, live:false };
+const SALES = { _d:null, prices:Object.fromEntries(MENU.map(m=>[m.n,m.p])), live:false, state:"loading", msg:"", updated:0,
+  days(){ return this._d || (this._d = sampleSales()); },
+  async load(){
+    try {
+      const r = await fetch("/api/sales", {credentials:"same-origin", cache:"no-store"});
+      if(r.status === 401){ location.href = "/login"; return; }
+      const j = await r.json();
+      if((j.status === "ready" || j.status === "error") && j.days && j.days.length){ this._d = j.days; this.prices = j.prices || {}; this.live = true; this.state = j.status === "ready" ? "live" : "stale"; this.msg = j.message || ""; this.updated = j.updated || 0; }
+      else if(j.status === "loading"){ this.state = "loading"; setTimeout(() => this.load(), 4000); }
+      else { this.state = j.status || "sample"; this.msg = j.message || ""; }
+    } catch(e){ this.state = "sample"; }
+    render();
+  } };
 
 /* ============ analytics ============ */
 /* normal-night baseline: event nights are left out of each weekday's list (when at least 3 other nights exist) so they are not counted twice */
@@ -302,7 +321,8 @@ function eventMoney(ev, days, settings, fc){
 }
 
 /* ============ saved data (events, inventory, cost assumptions) ============ */
-const S = {tab:"overview", events:[], inv:[], settings:{cogsPct:27,laborPct:22,fixedWeek:0}, loaded:false, db:null, slow:false,
+const LS = { get(k,d){ try{ const v = localStorage.getItem("korona:"+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem("korona:"+k, JSON.stringify(v)); return true; }catch(e){ return false; } } };
+const S = {local:false, tab:"overview", events:[], inv:[], settings:{cogsPct:27,laborPct:22,fixedWeek:0}, loaded:false, db:null, slow:false,
   month:new Date(today.getFullYear(), today.getMonth(), 1), report:"ledger", weekBack:0, trendDay:"all", invFilter:"all"};
 const TABS = [["overview","Overview"],["reports","Reports"],["forecast","Forecast"],["trends","Trends"],["events","Events"],["inventory","Inventory"]];
 let toastT;
@@ -311,22 +331,30 @@ async function initStore(){
   let db = null;
   try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch(e){ db = null; }
   S.db = db;
-  if(!db){ S.loaded = true; render(); return; }
+  if(!db){ S.local = true; S.events = LS.get("events", []); S.inv = LS.get("inventory", []); S.settings = {...S.settings, ...LS.get("settings", {})}; S.loaded = true; render(); return; }
   const timer = setTimeout(()=>{ if(!S.loaded){ S.loaded = true; S.slow = true; render(); } }, 10000);
   const done = () => { S.loaded = true; S.slow = false; clearTimeout(timer); render(); };
   db.collection("events").onSnapshot(s => { S.events = s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>a.date.localeCompare(b.date)); done(); }, done);
   db.collection("inventory").onSnapshot(s => { S.inv = s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>(a.cat+a.name).localeCompare(b.cat+b.name)); done(); }, done);
   db.doc("settings/main").onSnapshot(s => { if(s.exists) S.settings = {...S.settings, ...s.data()}; done(); }, done);
 }
+function saveLocal(path, data){
+  const [col, id] = path.split("/");
+  if(col === "settings"){ S.settings = {...data}; return LS.set("settings", S.settings); }
+  const arr = col === "events" ? S.events : S.inv, row = {id, ...data}, i = arr.findIndex(x => x.id === id);
+  if(i >= 0) arr[i] = row; else arr.push(row);
+  arr.sort((a,b) => col === "events" ? a.date.localeCompare(b.date) : (a.cat+a.name).localeCompare(b.cat+b.name));
+  const ok = LS.set(col, arr); if(!ok) toast("This browser would not save the change."); render(); return ok;
+}
 async function save(path, data){
-  if(!S.db){ toast("Saving is not available in this view. Open the page from claude.ai while signed in."); return false; }
+  if(!S.db) return saveLocal(path, data);
   try { await S.db.doc(path).set(data); return true; } catch(e){ toast("Could not save. Check your access and try again."); return false; }
 }
 async function remove(path){
-  if(!S.db) return false;
+  if(!S.db){ const [col, id] = path.split("/"); const arr = col === "events" ? S.events : S.inv; const i = arr.findIndex(x => x.id === id); if(i >= 0) arr.splice(i, 1); LS.set(col, arr); render(); return true; }
   try { await S.db.doc(path).delete(); return true; } catch(e){ toast("Could not delete."); return false; }
 }
-function newId(col){ return S.db ? S.db.collection(col).doc().id : col[0]+Date.now().toString(36); }
+function newId(col){ return S.db ? S.db.collection(col).doc().id : col[0]+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
 /* ============ charts (all drawn from one scale) ============ */
 function niceMax(v){ if(v<=0) return 100; const p = Math.pow(10, Math.floor(Math.log10(v))); for(const m of [1,1.5,2,2.5,3,4,5,6,8,10]) if(m*p >= v) return m*p; return 10*p; }
@@ -384,7 +412,7 @@ function weekNet(days, from, to){
 function itemTotals(days){
   const t = {}; days.forEach(d => Object.entries(d.items).forEach(([n,q]) => { t[n] = (t[n]||0)+q; })); return t;
 }
-function priceOf(n){ const m = MENU.find(x=>x.n===n); return m ? m.p : 0; }
+const priceOf = n => SALES.prices[n] || 0;
 
 /* ============ overview ============ */
 function viewOverview(){
@@ -428,10 +456,16 @@ function viewOverview(){
   </div>`;
 }
 function banner(){
-  if(!S.db && S.loaded) return `<div class="banner"><span><b>Saving is off in this view.</b> Events and inventory can be entered but will not be kept. Open the page from claude.ai while signed in.</span></div>`;
-  if(S.slow) return `<div class="banner"><span><b>Still loading saved data.</b> It may be out of date until the connection answers.</span></div>`;
-  if(!SALES.live) return `<div class="banner"><span><b>Sales shown are sample data.</b> Events, costs and inventory below are yours and are saved.</span><button class="link" data-act="connect">How to connect Clover</button></div>`;
-  return "";
+  const m = [];
+  if(SALES.state === "auth_error") m.push("<b>Clover rejected the token.</b> Check CLOVER_API_TOKEN and that it can read Orders, then restart the server.");
+  else if(SALES.state === "error") m.push("<b>Could not reach Clover.</b> Showing sample sales for now. " + esc(SALES.msg));
+  else if(SALES.state === "stale") m.push("<b>Clover could not be refreshed.</b> Showing the last sales that loaded. " + esc(SALES.msg));
+  else if(SALES.state === "not_configured") m.push("<b>Clover is not connected on the server.</b> Sales shown are sample data.");
+  else if(!SALES.live) m.push("<b>Sales shown are sample data.</b> Events, costs and inventory below are yours and are saved on this device.");
+  if(!S.db && S.loaded && !S.local) m.push("<b>Saving is off in this view.</b> Events and inventory will not be kept.");
+  if(S.slow) m.push("<b>Still loading saved data.</b> It may be out of date until the connection answers.");
+  if(!m.length) return "";
+  return `<div class="banner"><span>${m.join(" ")}</span>${SALES.live?"":`<button class="link" data-act="connect">How to connect Clover</button>`}</div>`;
 }
 
 /* ============ reports ============ */
@@ -542,10 +576,10 @@ function viewTrends(){
   const near = (() => { const t = top3.slice().sort((a,b)=>((a+20)%24)-((b+20)%24)); return t.map(hourLabel).join(", "); })();
   const wk = i => days.slice(-(i+1)*7, days.length-i*7);
   const weeks = [11,10,9,8,7,6,5,4,3,2,1,0].map(wk);
-  const rows = MENU.map(m => {
-    const series = weeks.map(w => sum(w.map(d=>d.items[m.n]||0))), a = sum(series.slice(-4)), b = sum(series.slice(-8,-4)), ch = b ? a/b-1 : 0;
-    return {n:m.n, series, a, ch, rev:a*m.p};
-  }).sort((x,y)=>y.ch-x.ch);
+  const rows = Object.keys(SALES.prices).map(n => {
+    const series = weeks.map(w => sum(w.map(d=>d.items[n]||0))), a = sum(series.slice(-4)), b = sum(series.slice(-8,-4)), ch = b ? a/b-1 : 0;
+    return {n, series, a, b, ch, rev:a*SALES.prices[n]};
+  }).filter(r => r.a + r.b >= 8).sort((x,y)=>y.rev-x.rev).slice(0,20).sort((x,y)=>y.ch-x.ch);
   return `
   <div class="head rise"><div><h2>Trends</h2><p>When the bar is busiest and which drinks are gaining or losing ground.</p></div></div>
   ${banner()}
@@ -693,9 +727,9 @@ function openConnect(){
     <div class="spread"><h3 id="ct">Connect Clover</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
     <p>Browsers block a page like this from calling Clover directly, and your API token must never sit in a web page. So live sales come through a small server that holds the token and passes your sales to this page.</p>
     <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
-      <li>Keep your Merchant ID and read-only API token in the server's environment settings.</li>
-      <li>The server reads orders with line items and payments from Clover's v3 API and returns one record per day: date, gross, transactions, sales per hour and units per item.</li>
-      <li>This page swaps its sample sales for that feed. Reports, forecast and trends then use your real numbers with no other changes.</li>
+      <li>Create a read-only API token in Clover with access to Orders, Payments and Inventory.</li>
+      <li>Add CLOVER_API_TOKEN, CLOVER_MERCHANT_ID and APP_PASSWORD to the server's environment settings, or to a local .env file.</li>
+      <li>Restart or redeploy the server. This page then loads your real sales on its own.</li>
     </ol>
     <p class="muted small">Never paste your token into this page or into chat.</p></div></div>`;
 }
@@ -715,6 +749,7 @@ function render(){
     if(k==="events"){ const n = S.events.filter(e=>e.date>=TODAY && e.date<=key(addDays(today,7))).length; if(n) b = `<span class="badge">${n}</span>`; }
     return `<button class="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}${b}</button>`;
   }).join("");
+  if(SALES.state === "loading"){ $("#main").innerHTML = `<div class="empty">Loading your Clover sales. The first load after the server starts can take a minute.</div>`; return; }
   try { $("#main").innerHTML = VIEWS[S.tab](); }
   catch(e){ $("#main").innerHTML = `<div class="empty">This section could not be drawn. Reload the page and try again.</div>`; console.error(e); }
   if(sig){ try { const el = $(sig); if(el && !$("#overlay").firstChild) el.focus({preventScroll:true}); } catch(e){} }
@@ -784,6 +819,8 @@ document.addEventListener("change", async ev => {
 });
 render();
 initStore();
+SALES.load();
+if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
 </script>
 </body>
 </html>

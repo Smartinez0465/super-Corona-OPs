@@ -1,0 +1,11 @@
+{
+  "name": "super-corona-ops",
+  "version": "1.0.0",
+  "description": "Sales, forecast, events and inventory dashboard for the bar, with a Clover sales feed.",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --env-file=.env server.js"
+  }
+}
