@@ -144,13 +144,29 @@ const isAuthed = req => { const c = cookieOf(req).korona_session; return !!c && 
 const fails = new Map();
 const ipOf = req => String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
 function loginPage(msg) {
+  const m = String(msg || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0C1A16"><title>Super Korona Ops</title>
-<style>:root{color-scheme:light dark}body{margin:0;min-height:100vh;display:grid;place-items:center;font:16px/1.5 system-ui,sans-serif;background:#EBEFEC;color:#12231E;padding:16px}
-@media(prefers-color-scheme:dark){body{background:#0C1A16;color:#E8F1ED}input{background:#13251F!important;color:#E8F1ED!important;border-color:#26443B!important}}
-form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px}h1{margin:0;font-size:30px}label{font-size:14px;font-weight:600}
-input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #CAD4CF;border-radius:8px;font:inherit;background:#F7F9F8}
-button{padding:11px;border:0;border-radius:8px;background:#B35A00;color:#fff;font:inherit;font-weight:700;cursor:pointer}.e{color:#B8332B;font-size:14px;min-height:20px}</style></head>
-<body><form method="post" action="/login"><h1>Super Korona Ops</h1><div><label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required autofocus></div><div class="e" role="alert">${msg || ""}</div><button type="submit">Sign in</button></form></body></html>`;
+<style>:root{color-scheme:light dark}body{margin:0;min-height:100vh;display:grid;place-items:center;font:18px/1.5 system-ui,sans-serif;background:#EBEFEC;color:#12231E;padding:16px}
+@media(prefers-color-scheme:dark){body{background:#0C1A16;color:#E8F1ED}input{background:#13251F!important;color:#E8F1ED!important;border-color:#26443B!important}.lang button{background:#13251F!important;color:#E8F1ED!important;border-color:#26443B!important}.lang button[aria-pressed=true]{background:#E8F1ED!important;color:#0C1A16!important}}
+form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px}h1{margin:0;font-size:32px}label{font-size:16px;font-weight:600}
+input{width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid #CAD4CF;border-radius:10px;font:inherit;background:#F7F9F8}
+button.go{padding:13px;border:0;border-radius:10px;background:#B35A00;color:#fff;font:inherit;font-weight:700;cursor:pointer;min-height:48px}.e{color:#B8332B;font-size:16px;min-height:22px}
+.lang{display:flex;gap:8px}.lang button{flex:1;padding:10px;border:1px solid #CAD4CF;border-radius:10px;background:#F7F9F8;color:#12231E;font:inherit;font-size:16px;font-weight:600;cursor:pointer;min-height:44px}.lang button[aria-pressed=true]{background:#12231E;color:#F7F9F8}</style></head>
+<body><form method="post" action="/login"><h1>Super Korona Ops</h1>
+<div class="lang" role="group" aria-label="Language / Idioma"><button type="button" data-l="en" lang="en">English</button><button type="button" data-l="es" lang="es">Español</button></div>
+<div><label for="p" data-t="Password">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required autofocus></div><div class="e" role="alert" data-t="${m}">${m}</div><button class="go" type="submit" data-t="Sign in">Sign in</button></form>
+<script>
+(function(){
+  var ES={"Password":"Contrase\u00f1a","Sign in":"Entrar","That password is not right.":"Esa contrase\u00f1a no es correcta.","Too many tries. Wait 10 minutes and try again.":"Demasiados intentos. Espere 10 minutos e intente de nuevo."};
+  var l="en"; try{ var s=localStorage.getItem("korona:lang"); if(s==="en"||s==="es") l=s; else l=String((navigator.languages&&navigator.languages[0])||navigator.language||"en").toLowerCase().indexOf("es")===0?"es":"en"; }catch(e){}
+  function apply(x){ l=x; document.documentElement.lang=x;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-t]"),function(e){ var k=e.getAttribute("data-t"); if(k) e.textContent=(x==="es"&&ES[k])||k; });
+    Array.prototype.forEach.call(document.querySelectorAll(".lang button"),function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-l")===x)); });
+    try{ localStorage.setItem("korona:lang",x); }catch(e){} }
+  Array.prototype.forEach.call(document.querySelectorAll(".lang button"),function(b){ b.addEventListener("click",function(){ apply(b.getAttribute("data-l")); }); });
+  apply(l);
+})();
+</script></body></html>`;
 }
 function readBody(req) { return new Promise(res => { let b = ""; req.on("data", c => { b += c; if (b.length > 4096) req.destroy(); }); req.on("end", () => res(b)); }); }
 

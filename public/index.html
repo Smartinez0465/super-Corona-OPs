@@ -35,28 +35,30 @@
   --heat0:#1B332C; --heat1:#7FD1B9; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:auto}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 button,input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3{margin:0;font-family:var(--f-display);font-weight:800;letter-spacing:.01em;text-wrap:balance}
-h2{font-size:34px;line-height:1.05}
-h3{font-size:22px;line-height:1.1}
+h2{font-size:38px;line-height:1.05}
+h3{font-size:25px;line-height:1.1}
 p{margin:0}
 .num{font-variant-numeric:tabular-nums}
 .shell{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:208px minmax(0,1fr);gap:28px;align-items:start}
 .rail{position:sticky;top:max(20px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:20px}
 .brand{font-family:var(--f-display);font-weight:800;font-size:30px;line-height:.95}
-.brand small{display:block;font:500 13px var(--f-body);color:var(--ink2);margin-top:6px}
+.brand small{display:block;font:500 14.5px var(--f-body);color:var(--ink2);margin-top:6px}
 .tabs{display:flex;flex-direction:column;gap:2px}
-.tab{appearance:none;border:0;background:none;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--ink2);font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tab{appearance:none;border:0;background:none;text-align:left;padding:12px 14px;font-size:17px;min-height:46px;border-radius:8px;cursor:pointer;color:var(--ink2);font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .tab:hover{background:var(--surface2);color:var(--ink)}
 .tab[aria-current="page"]{background:var(--ink);color:var(--bg)}
-.tab .badge{font:600 12px var(--f-body);background:var(--accent);color:var(--accent-ink);border-radius:99px;padding:1px 8px}
+.tab .badge{font:600 14px var(--f-body);background:var(--accent);color:var(--accent-ink);border-radius:99px;padding:1px 8px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.railnote{font-size:13px;color:var(--ink2);border-top:1px solid var(--line);padding-top:14px}
+.railrow{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.railrow .seg button{padding:8px 12px;min-height:40px}
+.railnote{font-size:14.5px;color:var(--ink2);border-top:1px solid var(--line);padding-top:14px}
 .main{min-width:0;display:flex;flex-direction:column;gap:22px}
 .head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.head p{color:var(--ink2);max-width:62ch;margin-top:6px}
-.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:14px}
+.head p{color:var(--ink2);max-width:62ch;margin-top:8px;font-size:17px}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:12px 16px;font-size:16px}
 .banner b{font-weight:700}
 .link{appearance:none;background:none;border:0;padding:0;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
@@ -67,44 +69,45 @@ p{margin:0}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 .stat{display:flex;flex-direction:column;gap:2px;min-width:0}
-.stat .k{font-size:13px;color:var(--ink2)}
-.stat .v{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1}
-.stat .s{font-size:13px;color:var(--ink2)}
+.stat .k{font-size:16px;font-weight:600;color:var(--ink)}
+.stat .v{font-family:var(--f-display);font-weight:800;font-size:48px;line-height:1.05}
+.stat .s{font-size:15px;color:var(--ink2)}
 .pos{color:var(--good)} .neg{color:var(--bad)} .proj{color:var(--accent)}
-.pill{display:inline-flex;align-items:center;gap:5px;font:600 12.5px var(--f-body);padding:2px 9px;border-radius:99px;background:var(--surface2);color:var(--ink2);white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 14px var(--f-body);padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--ink2);white-space:nowrap}
 .pill.good{background:var(--good-soft);color:var(--good)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.warn{background:var(--accent-soft);color:var(--accent)}
-.btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;min-height:38px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;min-height:46px;font-size:16.5px}
 .btn:hover{border-color:var(--ink2)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .btn.danger{color:var(--bad)}
-.btn.sm{padding:4px 10px;min-height:30px;font-size:13.5px}
+.btn.sm{padding:6px 12px;min-height:40px;font-size:15px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
-.seg button{appearance:none;border:0;background:var(--surface);padding:7px 13px;font-weight:600;cursor:pointer;color:var(--ink2)}
+.seg button{appearance:none;border:0;background:var(--surface);padding:10px 15px;min-height:44px;font-weight:600;font-size:16px;cursor:pointer;color:var(--ink2)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .tablewrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th{font-weight:600;color:var(--ink2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th{font-weight:600;font-size:14.5px;color:var(--ink2);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
 th.r,td.r{text-align:right}
 tr:last-child td{border-bottom:0}
+td.num,th.r{white-space:nowrap}
 tbody tr.clickable{cursor:pointer}
 tbody tr.clickable:hover{background:var(--surface2)}
-.muted{color:var(--ink2)} .small{font-size:13px}
+.muted{color:var(--ink2)} .small{font-size:14.5px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .spread{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .empty{padding:28px;text-align:center;color:var(--ink2);border:1px dashed var(--line);border-radius:12px}
 /* charts */
-.chart{width:100%;height:auto;display:block}
-.chart text{fill:var(--ink2);font:12px var(--f-body)}
-.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin-top:8px}
+.chart{width:100%;max-width:820px;height:auto;display:block}
+.chart text{fill:var(--ink2);font:18px var(--f-body)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:15px;color:var(--ink2);margin-top:8px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 /* heat map */
-.heat{display:grid;gap:3px;min-width:560px}
-.heat .cell{height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11.5px}
-.heat .lab{font-size:12.5px;color:var(--ink2);display:flex;align-items:center}
+.heat{display:grid;gap:3px;min-width:620px}
+.heat .cell{height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12.5px}
+.heat .lab{font-size:14px;color:var(--ink2);display:flex;align-items:center}
 .heat .hl{justify-content:center;height:auto}
 /* receipt: the one loud element */
-.receipt{font-family:var(--f-mono);font-size:13.5px;background:var(--surface);border:1px solid var(--line);padding:22px 20px 26px;position:relative;max-width:460px;
+.receipt{font-family:var(--f-mono);font-size:15px;background:var(--surface);border:1px solid var(--line);padding:22px 20px 26px;position:relative;max-width:460px;
   -webkit-mask:radial-gradient(circle 6px at 6px 100%,#0000 98%,#000) 0 0/12px 100%;mask:radial-gradient(circle 6px at 6px 100%,#0000 98%,#000) 0 0/12px 100%}
 .receipt .t{text-align:center;font-family:var(--f-display);font-size:26px;font-weight:800;letter-spacing:.04em}
 .receipt .sub{text-align:center;color:var(--ink2);margin-bottom:14px}
@@ -113,19 +116,19 @@ tbody tr.clickable:hover{background:var(--surface2)}
 .receipt .tot{border-top:2px solid var(--ink);margin-top:10px;padding-top:8px;font-weight:500;font-size:16px}
 /* calendar */
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:640px}
-.cal .dow{font-size:12.5px;color:var(--ink2);padding:2px 6px}
+.cal .dow{font-size:14px;color:var(--ink2);padding:2px 6px}
 .cal .day{min-height:92px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;cursor:pointer;text-align:left;appearance:none;font:inherit;color:inherit}
 .cal .day:hover{border-color:var(--ink2)}
 .cal .day.out{opacity:.45}
 .cal .day.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.cal .dn{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
-.chip{font-size:12px;line-height:1.25;border-radius:5px;padding:2px 5px;background:var(--series-soft);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal .dn{font-size:14px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.chip{font-size:13px;line-height:1.25;border-radius:5px;padding:2px 5px;background:var(--series-soft);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip.future{background:var(--accent-soft)}
 .chip.loss{background:var(--bad-soft)}
 /* forms + modal */
 .field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.field label{font-size:13px;font-weight:600;color:var(--ink2)}
-.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:38px;width:100%}
+.field label{font-size:15px;font-weight:600;color:var(--ink)}
+.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:46px;width:100%;font-size:16.5px}
 .field input:focus,.field select:focus{border-color:var(--accent)}
 .fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .fgrid .full{grid-column:1/-1}
@@ -133,12 +136,20 @@ tbody tr.clickable:hover{background:var(--surface2)}
 .modal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;width:100%;max-width:520px;display:flex;flex-direction:column;gap:16px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-weight:600;z-index:60;max-width:90vw}
 .step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.step button{appearance:none;border:0;background:var(--surface2);width:30px;height:30px;cursor:pointer;font-weight:700}
-.step span{min-width:38px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.step button{appearance:none;border:0;background:var(--surface2);width:44px;height:44px;cursor:pointer;font-weight:700;font-size:20px}
+.step span{min-width:44px;font-size:17px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
 .bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;min-width:70px}
 .bar i{display:block;height:100%;background:var(--series);border-radius:99px}
 .bar.low i{background:var(--accent)} .bar.out i{background:var(--bad)}
 .cards{display:none}
+.plain ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:18.5px;line-height:1.45;max-width:72ch}
+.plain{border-left:5px solid var(--accent)}
+.help{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.help summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:16.5px;list-style:none;display:flex;gap:10px;align-items:center;min-height:48px}
+.help summary::-webkit-details-marker{display:none}
+.help summary::before{content:"?";display:inline-grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:15px}
+.help[open] summary{border-bottom:1px solid var(--line)}
+.help ul{margin:0;padding:14px 18px 16px 40px;display:flex;flex-direction:column;gap:8px;max-width:72ch}
 @media (max-width:980px){
   .g4{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(2,minmax(0,1fr))} .g21{grid-template-columns:minmax(0,1fr)}
 }
@@ -148,8 +159,9 @@ tbody tr.clickable:hover{background:var(--surface2)}
   .tabs{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:4px}
   .tab{white-space:nowrap}
   .railnote{display:none}
-  .stat .v{font-size:38px}
-  h2{font-size:30px}
+  .stat .v{font-size:42px}
+  h2{font-size:32px}
+  .plain ul{font-size:17.5px}
   .tbl-inv{display:none} .cards{display:flex;flex-direction:column;gap:10px}
 }
 @media (max-width:560px){
@@ -161,9 +173,10 @@ tbody tr.clickable:hover{background:var(--surface2)}
 <body>
 <div class="shell">
   <aside class="rail">
-    <div class="brand">Super Korona<small>Sales, nights and stock</small></div>
-    <nav class="tabs" id="tabs" aria-label="Sections"></nav>
-    <div class="railnote">Events, costs and inventory you enter are saved on this device. <a class="link" href="/logout">Sign out</a></div>
+    <div class="brand">Super Korona<small id="brandsub"></small></div>
+    <div class="railrow"><div class="seg" id="langseg" role="group" aria-label="Language / Idioma"></div><a class="link" id="signout" href="/logout"></a></div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="railnote" id="railnote"></div>
   </aside>
   <main class="main" id="main" aria-live="polite"></main>
 </div>
@@ -171,6 +184,324 @@ tbody tr.clickable:hover{background:var(--surface2)}
 <div id="toast" class="toast" hidden></div>
 <script>
 "use strict";
+/* ============ language (English / Spanish) ============
+   t("English text") returns the Spanish version when Spanish is chosen. Text with no Spanish entry stays in English.
+   {name} marks a value that is filled in. The choice is remembered on this device. */
+let LANG = (() => { try { const s = localStorage.getItem("korona:lang"); if(s === "en" || s === "es") return s; } catch(e){} return String((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase().startsWith("es") ? "es" : "en"; })();
+const NAMES = {
+  en:{dow:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], dowl:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], dowp:["Sundays","Mondays","Tuesdays","Wednesdays","Thursdays","Fridays","Saturdays"], mon:["January","February","March","April","May","June","July","August","September","October","November","December"]},
+  es:{dow:["dom","lun","mar","mié","jue","vie","sáb"], dowl:["domingo","lunes","martes","miércoles","jueves","viernes","sábado"], dowp:["domingos","lunes","martes","miércoles","jueves","viernes","sábados"], mon:["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"]}
+};
+let DOW, DOWL, DOWP, MON;
+function setNames(){ const n = NAMES[LANG]; DOW = n.dow; DOWL = n.dowl; DOWP = n.dowp; MON = n.mon; document.documentElement.lang = LANG; }
+setNames();
+const ES = {};
+function t(s, v){ let o = (LANG === "es" && ES[s]) || s; if(v) o = o.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m); return o; }
+const pl = (n, one, many) => t(n === 1 ? one : many, {n});
+Object.assign(ES, {
+"This browser would not save the change.":"Este navegador no guardó el cambio.",
+"Could not save. Check your access and try again.":"No se pudo guardar. Revise su acceso e intente de nuevo.",
+"Could not delete.":"No se pudo borrar.",
+"Daily sales: last 14 days and the next 7 days expected":"Ventas por día: los últimos 14 días y los próximos 7 días esperados",
+"Daily sales for the last 28 days and expected sales for the next 14 days":"Ventas por día de los últimos 28 días y ventas esperadas de los próximos 14 días",
+"today":"hoy",
+"What am I looking at?":"¿Qué estoy viendo?",
+"No sales were recorded yesterday ({day}).":"Ayer ({day}) no se registraron ventas.",
+"Yesterday ({day}) the bar sold {amt}. That is about a normal {day}.":"Ayer ({day}) el bar vendió {amt}. Es casi igual a un {day} normal.",
+"Yesterday ({day}) the bar sold {amt}. That is {p} more than a normal {day} (about {usual}).":"Ayer ({day}) el bar vendió {amt}. Es {p} más que un {day} normal (alrededor de {usual}).",
+"Yesterday ({day}) the bar sold {amt}. That is {p} less than a normal {day} (about {usual}).":"Ayer ({day}) el bar vendió {amt}. Es {p} menos que un {day} normal (alrededor de {usual}).",
+"Yesterday ({day}) the bar sold {amt}.":"Ayer ({day}) el bar vendió {amt}.",
+"Over the next 7 days we expect about {amt} in sales.":"En los próximos 7 días esperamos alrededor de {amt} en ventas.",
+"Next event: {name} on {day}.":"Próximo evento: {name}, el {day}.",
+"Add your stock on the Inventory tab to get reorder reminders.":"Agregue su mercancía en la pestaña Inventario para recibir avisos de qué pedir.",
+"Nothing needs to be reordered right now.":"Por ahora no hay nada que pedir.",
+"about":"alrededor de",
+"A quick look at the last 7 days, the week ahead, and what needs your attention.":"Un vistazo rápido a los últimos 7 días, la semana que viene y lo que necesita su atención.",
+"In plain words":"En palabras simples",
+"Total sales, last 7 days":"Ventas totales, últimos 7 días",
+"Up {p} compared with the 7 days before":"{p} más que los 7 días anteriores",
+"Down {p} compared with the 7 days before":"{p} menos que los 7 días anteriores",
+"Expected sales, next 7 days":"Ventas esperadas, próximos 7 días",
+"A guess based on your usual weekly pattern, the recent trend and any events":"Un cálculo basado en su semana normal, la tendencia reciente y los eventos",
+"Profit after costs, last 7 days (estimate)":"Ganancia después de gastos, últimos 7 días (estimado)",
+"After drinks cost, staff, event costs and fixed costs":"Después del costo de bebidas, personal, eventos y gastos fijos",
+"After drinks cost, staff and event costs":"Después del costo de bebidas, personal y eventos",
+"Items to reorder":"Productos por pedir",
+"{n} out of stock, ":"{n} agotados, ",
+"{n} running low":"{n} por acabarse",
+"Add items on the Inventory tab":"Agregue productos en la pestaña Inventario",
+"Sales each day":"Ventas por día",
+"See the full forecast":"Ver el pronóstico completo",
+"Sold":"Vendido",
+"Expected":"Esperado",
+"Coming up":"Próximos",
+"Schedule":"Calendario",
+"DJ not set":"DJ sin asignar",
+"costs {amt}":"cuesta {amt}",
+"Expected sales":"Ventas esperadas",
+"profit":"ganancia",
+"No events scheduled yet. Add your next DJ night on the Events tab.":"Todavía no hay eventos. Agregue su próxima noche de DJ en la pestaña Eventos.",
+"Best sellers, last 7 days":"Lo más vendido, últimos 7 días",
+"All trends":"Todas las tendencias",
+"{n} sold":"{n} vendidos",
+"Busiest hours, last 4 weeks":"Horas más ocupadas, últimas 4 semanas",
+"Most sales happen around":"La mayoría de las ventas ocurren alrededor de",
+"Have staff and stock ready before then.":"Tenga el personal y la mercancía listos antes de esa hora.",
+"Based on {amt} in sales over 28 days.":"Basado en {amt} en ventas durante 28 días.",
+"<b>Clover rejected the access token.</b> Check CLOVER_API_TOKEN and make sure it can read Orders, then restart the server.":"<b>Clover rechazó la clave de acceso.</b> Revise CLOVER_API_TOKEN y confirme que puede leer Pedidos (Orders); luego reinicie el servidor.",
+"<b>Could not reach Clover.</b> Showing sample sales for now.":"<b>No se pudo conectar con Clover.</b> Por ahora se muestran ventas de ejemplo.",
+"<b>Clover could not be refreshed.</b> Showing the last sales that loaded.":"<b>No se pudo actualizar Clover.</b> Se muestran las últimas ventas que cargaron.",
+"<b>Clover is not connected on the server.</b> The sales shown are sample data.":"<b>Clover no está conectado en el servidor.</b> Las ventas que se ven son de ejemplo.",
+"<b>The sales shown are sample data.</b> Events, costs and inventory you enter are real and are saved on this device.":"<b>Las ventas que se ven son de ejemplo.</b> Los eventos, gastos e inventario que usted agrega son reales y se guardan en este dispositivo.",
+"<b>Saving is off in this view.</b> Events and inventory will not be kept.":"<b>Guardar está desactivado en esta vista.</b> Los eventos y el inventario no se conservarán.",
+"<b>Still loading saved data.</b> It may be out of date until the connection answers.":"<b>Todavía se están cargando los datos guardados.</b> Pueden estar desactualizados hasta que responda la conexión.",
+"How to connect Clover":"Cómo conectar Clover",
+"Day":"Día",
+"Total sales":"Ventas totales",
+"Number of sales":"Número de ventas",
+"Average sale":"Venta promedio",
+"Event":"Evento",
+"with":"con",
+"WEEKLY SUMMARY":"RESUMEN SEMANAL",
+"to":"a",
+"(so far)":"(hasta ahora)",
+"Drinks and supplies ({n}%)":"Bebidas e insumos ({n}%)",
+"Staff pay ({n}%)":"Pago al personal ({n}%)",
+"DJs and event costs":"DJs y costos de eventos",
+"Other fixed costs":"Otros gastos fijos",
+"PROFIT":"GANANCIA",
+"LOSS":"PÉRDIDA",
+"Usual sales":"Ventas normales",
+"Best night":"Mejor noche",
+"Slowest night":"Noche más lenta",
+"Share of the week":"Parte de la semana",
+"Normal nights over the last 8 weeks. Event nights are left out so they do not make the averages look too high.":"Noches normales de las últimas 8 semanas. Las noches con evento no se incluyen para que los promedios no salgan demasiado altos.",
+"Item":"Producto",
+"Sold, last 28 days":"Vendido, últimos 28 días",
+"Money made":"Dinero generado",
+"Share of sales":"Parte de las ventas",
+"Change vs the 28 days before":"Cambio vs. los 28 días anteriores",
+"Date":"Fecha",
+"DJ":"DJ",
+"Sales":"Ventas",
+"DJ and other costs":"DJ y otros costos",
+"Profit for the night":"Ganancia de la noche",
+"Worth it? (vs a normal night)":"¿Valió la pena? (vs. una noche normal)",
+"Worth it? compares the night with a normal night on the same day of the week: the extra sales (after the cost of drinks) minus the DJ and event costs. Plus means the event paid for itself.":"¿Valió la pena? compara la noche con una noche normal del mismo día de la semana: las ventas extra (después del costo de las bebidas) menos los costos del DJ y del evento. Un número positivo (+) significa que el evento se pagó solo.",
+"Category":"Categoría",
+"On hand":"En existencia",
+"Keep at least":"Mantener al menos",
+"On order":"Pedido en camino",
+"Order this many":"Pedir esta cantidad",
+"Estimated cost":"Costo estimado",
+"Estimated total:":"Total estimado:",
+"Everything is at or above the minimum. Nothing to order.":"Todo está en el mínimo o por encima. No hay nada que pedir.",
+"No past events yet. Add them on the Events tab.":"Todavía no hay eventos pasados. Agréguelos en la pestaña Eventos.",
+"Nothing to show for this period.":"No hay nada que mostrar para este período.",
+"Reports":"Reportes",
+"Pick a report, then download it as a spreadsheet file. Costs use the percentages at the bottom of this page, so set them to match your books.":"Elija un reporte y descárguelo como hoja de cálculo. Los costos usan los porcentajes al final de esta página; ajústelos para que coincidan con sus cuentas.",
+"Download spreadsheet":"Descargar hoja de cálculo",
+"Report type":"Tipo de reporte",
+"Week":"Semana",
+"Day by day":"Día por día",
+"Your cost estimates":"Sus costos estimados",
+"Drinks and supplies, % of sales":"Bebidas e insumos, % de las ventas",
+"Staff pay, % of sales":"Pago al personal, % de las ventas",
+"Other costs per week ($)":"Otros gastos por semana ($)",
+"Rent, utilities and insurance can go under other costs. These are estimates until you enter your real costs.":"La renta, los servicios y el seguro pueden ir en otros gastos. Son estimados hasta que usted ponga sus costos reales.",
+"Trend: up {p}.":"Tendencia: sube {p}.",
+"Trend: down {p}.":"Tendencia: baja {p}.",
+"Trend: flat.":"Tendencia: estable.",
+"Forecast":"Pronóstico",
+"What you can expect to make each night. It looks at the same day of the week over the last 8 weeks, the recent trend, and any events you scheduled.":"Lo que puede esperar vender cada noche. Se basa en el mismo día de la semana de las últimas 8 semanas, la tendencia reciente y los eventos que programó.",
+"Next 7 days":"Próximos 7 días",
+"Up {p} compared with the last 7 days":"{p} más que los últimos 7 días",
+"Down {p} compared with the last 7 days":"{p} menos que los últimos 7 días",
+"Next 14 days":"Próximos 14 días",
+"Profit, next 7 days (estimate)":"Ganancia, próximos 7 días (estimado)",
+"After costs and scheduled events":"Después de gastos y eventos programados",
+"How far off the guess was":"Qué tan lejos estuvo el cálculo",
+"n/a":"n/d",
+"Average miss over the last 4 weeks.":"Error promedio en las últimas 4 semanas.",
+"Sold and expected":"Vendido y esperado",
+"Likely range":"Rango probable",
+"Dots mark scheduled events":"Los puntos marcan eventos programados",
+"Costs":"Costos",
+"Expected profit":"Ganancia esperada",
+"Today":"Hoy",
+"None":"Ninguno",
+"How the number is built":"Cómo se calcula el número",
+"Each day starts from the average of that day of the week over the last 8 weeks, then is adjusted by how the last 4 weeks compare with the 4 before. A scheduled event lifts the day by the average boost your past events gave ({p} right now). The range shows the usual ups and downs for that day. Holidays and weather are not included, so treat big holiday weekends as a floor you can beat or miss.":"Cada día parte del promedio de ese día de la semana en las últimas 8 semanas, y se ajusta según cómo van las últimas 4 semanas comparadas con las 4 anteriores. Un evento programado sube el día según el aumento promedio de sus eventos pasados ({p} ahora). El rango muestra los altibajos normales de ese día. No se incluyen días festivos ni el clima, así que en fines de semana largos tómelo como un mínimo que puede superar o no alcanzar.",
+"about {amt} per night":"alrededor de {amt} por noche",
+"Trends":"Tendencias",
+"When the bar is busiest, and which drinks are selling more or less than before.":"Cuándo el bar está más lleno y qué bebidas se venden más o menos que antes.",
+"Busiest hours":"Horas más ocupadas",
+"Average sales per hour, last 8 weeks":"Ventas promedio por hora, últimas 8 semanas",
+"Hour by hour":"Hora por hora",
+"Day filter":"Filtro de día",
+"All":"Todos",
+"Across the whole week":"En toda la semana",
+"On {day}":"Los {day}",
+"most of the money is made around":"la mayor parte del dinero se gana alrededor de",
+"Drinks selling more or less":"Bebidas que se venden más o menos",
+"Last 4 weeks compared with the 4 before":"Últimas 4 semanas comparadas con las 4 anteriores",
+"Drink":"Bebida",
+"Last 12 weeks":"Últimas 12 semanas",
+"Sold, last 4 weeks":"Vendido, últimas 4 semanas",
+"Change":"Cambio",
+"Selling more":"Se vende más",
+"Selling less":"Se vende menos",
+"Steady":"Estable",
+"add an event":"agregar un evento",
+"Events":"Eventos",
+"Schedule each night, who is DJing and what it costs. Sales come from your Clover sales for that date. Profit is sales minus drinks cost, staff pay and the event costs.":"Programe cada noche, quién es el DJ y cuánto cuesta. Las ventas vienen de sus ventas de Clover de esa fecha. La ganancia es las ventas menos el costo de bebidas, el pago al personal y los costos del evento.",
+"Remove sample events":"Quitar eventos de ejemplo",
+"Add event":"Agregar evento",
+"Events in the next 30 days":"Eventos en los próximos 30 días",
+"Costs {amt}":"Costos {amt}",
+"Nothing scheduled":"Nada programado",
+"Profit from events, last 30 days":"Ganancia de eventos, últimos 30 días",
+"Events that were worth it":"Eventos que valieron la pena",
+"{a} of {b}":"{a} de {b}",
+"Brought in more than the event cost":"Dejaron más de lo que costó el evento",
+"DJ and event spending, last 30 days":"Gasto en DJ y eventos, últimos 30 días",
+"Previous month":"Mes anterior",
+"Previous":"Anterior",
+"This month":"Este mes",
+"Next month":"Mes siguiente",
+"Next":"Siguiente",
+"Made money":"Ganó dinero",
+"Lost money":"Perdió dinero",
+"Tap a day to add an event, or tap an event to change it.":"Toque un día para agregar un evento, o toque un evento para cambiarlo.",
+"All events":"Todos los eventos",
+"Profit":"Ganancia",
+"Worth it?":"¿Valió la pena?",
+"expected":"esperado",
+"entered":"anotado",
+"Sample":"Ejemplo",
+"No sales yet":"Aún sin ventas",
+"Scheduled":"Programado",
+"Loss":"Pérdida",
+"Worth it? compares the night with a normal night on the same day of the week: the extra sales (after the cost of drinks) minus the DJ and event costs. Green means the event paid for itself.":"¿Valió la pena? compara la noche con una noche normal del mismo día de la semana: las ventas extra (después del costo de las bebidas) menos los costos del DJ y del evento. Verde significa que el evento se pagó solo.",
+"No events yet. Add your first DJ night to see what it costs and what it brings in.":"Todavía no hay eventos. Agregue su primera noche de DJ para ver cuánto cuesta y cuánto deja.",
+"Edit event":"Editar evento",
+"New event":"Nuevo evento",
+"Close":"Cerrar",
+"Latin Night":"Noche Latina",
+"DJ name":"Nombre del DJ",
+"DJ fee ($)":"Pago al DJ ($)",
+"Other event costs ($)":"Otros costos del evento ($)",
+"Sales for the night ($), optional":"Ventas de la noche ($), opcional",
+"Notes":"Notas",
+"Promo, security, special pricing":"Promoción, seguridad, precios especiales",
+"Leave sales empty to use your Clover sales for that date. Other costs can include security, promotion, decorations and extra staff.":"Deje las ventas vacías para usar sus ventas de Clover de esa fecha. Otros costos pueden incluir seguridad, promoción, decoración y personal extra.",
+"Delete event":"Borrar evento",
+"Save event":"Guardar evento",
+"Add a date and an event name.":"Agregue una fecha y el nombre del evento.",
+"Event saved":"Evento guardado",
+"Out":"Agotado",
+"Low":"Poco",
+"OK":"Bien",
+"One less":"Uno menos de",
+"One more":"Uno más de",
+"under 1 day":"menos de 1 día",
+"on":"el",
+"date not set":"fecha sin definir",
+"Mark received":"Marcar como recibido",
+"Edit":"Editar",
+"Lasts about":"Dura alrededor de",
+"Inventory":"Inventario",
+"What is on the shelf and what is on the way. Use the plus and minus buttons for quick counts, and tap Mark received when an order arrives.":"Lo que hay en el estante y lo que viene en camino. Use los botones + y − para contar rápido, y toque Marcar como recibido cuando llegue un pedido.",
+"Remove sample items":"Quitar productos de ejemplo",
+"Add item":"Agregar producto",
+"Items tracked":"Productos en el inventario",
+"Value of stock on hand":"Valor de la mercancía en existencia",
+"What you paid for what is on the shelf":"Lo que pagó por lo que hay en el estante",
+"Below the minimum":"Por debajo del mínimo",
+"{n} completely out":"{n} totalmente agotados",
+"{amt} arriving":"{amt} por llegar",
+"Filter":"Filtro",
+"Needs attention":"Requiere atención",
+"Stock vs minimum":"Existencia vs. mínimo",
+"Value":"Valor",
+"Status":"Estado",
+"No items match this filter.":"Ningún producto coincide con este filtro.",
+"No inventory yet. Add the bottles, kegs and cases you stock, with a minimum amount to keep for each.":"Todavía no hay inventario. Agregue las botellas, barriles y cajas que maneja, con una cantidad mínima a mantener de cada una.",
+"Lasts about uses the weekly amount you enter for each item. Once Clover sales are connected, usage can be worked out from sales.":"«Dura alrededor de» usa la cantidad semanal que usted anota en cada producto. Cuando las ventas de Clover estén conectadas, el uso se podrá calcular a partir de las ventas.",
+"Edit item":"Editar producto",
+"New item":"Nuevo producto",
+"Counted as":"Se cuenta como",
+"case of 24, 750 ml bottle, half keg":"caja de 24, botella de 750 ml, medio barril",
+"Keep at least (minimum)":"Mantener al menos (mínimo)",
+"Cost per unit ($)":"Costo por unidad ($)",
+"Used per week":"Se usa por semana",
+"On order (units)":"Pedido en camino (unidades)",
+"Arrives on":"Llega el",
+"Delete item":"Borrar producto",
+"Save item":"Guardar producto",
+"Give the item a name.":"Póngale un nombre al producto.",
+"Item saved":"Producto guardado",
+"Connect Clover":"Conectar Clover",
+"Browsers do not let a page like this call Clover directly, and your access token must never sit in a web page. So live sales come through a small server that holds the token and passes your sales to this page.":"Los navegadores no permiten que una página como esta llame a Clover directamente, y su clave de acceso nunca debe estar en una página web. Por eso las ventas en vivo llegan a través de un pequeño servidor que guarda la clave y le pasa sus ventas a esta página.",
+"Create a read-only API token in Clover with access to Orders, Payments and Inventory.":"Cree en Clover una clave API de solo lectura con acceso a Pedidos (Orders), Pagos (Payments) e Inventario.",
+"Add CLOVER_API_TOKEN, CLOVER_MERCHANT_ID and APP_PASSWORD to the server's environment settings, or to a local .env file.":"Agregue CLOVER_API_TOKEN, CLOVER_MERCHANT_ID y APP_PASSWORD a la configuración del servidor, o a un archivo .env local.",
+"Restart or redeploy the server. This page then loads your real sales on its own.":"Reinicie o vuelva a publicar el servidor. Luego esta página carga sus ventas reales sola.",
+"Never paste your token into this page or into a chat.":"Nunca pegue su clave en esta página ni en un chat.",
+"Sales, nights and stock":"Ventas, noches e inventario",
+"Sign out":"Cerrar sesión",
+"Events, costs and inventory you enter are saved on this device.":"Los eventos, gastos e inventario que usted agrega se guardan en este dispositivo.",
+"Sections":"Secciones",
+"Loading your Clover sales. The first load after the server wakes up can take a minute or two.":"Cargando sus ventas de Clover. La primera carga, cuando el servidor despierta, puede tardar uno o dos minutos.",
+"This section could not be drawn. Reload the page and try again.":"No se pudo mostrar esta sección. Recargue la página e intente de nuevo.",
+"Sample rows removed":"Ejemplos quitados",
+"Delivery added to stock":"Entrega sumada a la existencia",
+"Event deleted":"Evento borrado",
+"Item deleted":"Producto borrado",
+"Report saved":"Reporte guardado",
+"Could not save the file.":"No se pudo guardar el archivo.",
+"{n} item needs to be reordered.":"Hay {n} producto por pedir.",
+"{n} items need to be reordered.":"Hay {n} productos por pedir.",
+"{n} event night":"{n} noche de evento",
+"{n} event nights":"{n} noches de evento",
+"Across {n} night":"En {n} noche",
+"Across {n} nights":"En {n} noches",
+"{n} day":"{n} día",
+"{n} days":"{n} días",
+"{n} category":"{n} categoría",
+"{n} categories":"{n} categorías",
+"Total sales is everything rung up on Clover, before any costs are taken out.":"Ventas totales es todo lo que se cobró en Clover, antes de restar cualquier gasto.",
+"Profit after costs is an estimate: sales minus the cost of drinks, staff pay and event costs. You can change those percentages on the Reports tab.":"La ganancia después de gastos es un estimado: las ventas menos el costo de las bebidas, el pago al personal y los costos de eventos. Puede cambiar esos porcentajes en la pestaña Reportes.",
+"Orange means a guess about the future, or something that needs your attention.":"El color naranja significa un cálculo a futuro, o algo que necesita su atención.",
+"Pick a report from the buttons below. The table updates right away.":"Elija un reporte con los botones de abajo. La tabla cambia de inmediato.",
+"Tap Download spreadsheet to save the report as a CSV file that opens in Excel or Google Sheets.":"Toque Descargar hoja de cálculo para guardar el reporte como archivo CSV que se abre en Excel o Google Sheets.",
+"Profit numbers use the cost percentages at the bottom of this page. Change them to match your real costs.":"Las ganancias usan los porcentajes de costos al final de esta página. Cámbielos para que coincidan con sus costos reales.",
+"The forecast is a smart guess, not a promise.":"El pronóstico es un cálculo inteligente, no una promesa.",
+"It starts from what you usually make on that day of the week, then adjusts for whether sales have been going up or down lately.":"Parte de lo que normalmente vende ese día de la semana, y luego se ajusta según si las ventas han subido o bajado últimamente.",
+"Days with a scheduled event get a boost, based on how your past events did.":"Los días con un evento programado suben, según cómo les fue a sus eventos pasados.",
+"The shaded band on the chart is the range we think is likely. Holidays and weather are not included.":"La franja sombreada de la gráfica es el rango que creemos probable. No se incluyen días festivos ni el clima.",
+"In the hour chart, a darker square means more sales in that hour.":"En la gráfica de horas, un cuadro más oscuro significa más ventas en esa hora.",
+"Hours go from 4 pm to 3 am. Find your busiest day and hour to plan staff and stock.":"Las horas van de 4 pm a 3 am. Busque su día y hora más ocupados para planear el personal y la mercancía.",
+"The drinks table compares the last 4 weeks with the 4 weeks before, so you can see what is selling more or less.":"La tabla de bebidas compara las últimas 4 semanas con las 4 anteriores, para ver qué se vende más o menos.",
+"Tap Add event, or tap any day on the calendar, to schedule a night with the DJ and what it costs.":"Toque Agregar evento, o cualquier día del calendario, para programar una noche con el DJ y su costo.",
+"Profit for the night is sales minus the cost of drinks, staff pay, and the DJ and event costs.":"La ganancia de la noche es las ventas menos el costo de bebidas, el pago al personal y los costos del DJ y del evento.",
+"On the calendar, green means the night made money and red means it lost money. Orange is coming up.":"En el calendario, verde significa que la noche ganó dinero y rojo que perdió dinero. Naranja es lo que viene.",
+"Worth it? tells you if the event brought in more than a normal night would have, after its costs.":"¿Valió la pena? le dice si el evento dejó más que una noche normal, después de sus costos.",
+"Use + and - to update a count in seconds. It saves by itself.":"Use + y − para actualizar una cantidad en segundos. Se guarda solo.",
+"Keep at least is the smallest amount you want on hand. When the count drops below it, the item shows as Low.":"«Mantener al menos» es la cantidad mínima que quiere tener. Cuando baja de ahí, el producto aparece como Poco.",
+"When an order is on the way, enter how many and when. Tap Mark received when it arrives and the stock count goes up.":"Cuando viene un pedido en camino, anote cuántos y cuándo. Toque Marcar como recibido cuando llegue y la existencia sube.",
+"Items that need attention are collected in the Needs attention filter and on the Reports tab as a shopping list.":"Los productos que necesitan atención se juntan en el filtro Requiere atención y en la pestaña Reportes como lista de compras.",
+"Overview":"Resumen",
+"This week":"Esta semana",
+"Last week":"Semana pasada",
+"2 weeks ago":"Hace 2 semanas",
+"3 weeks ago":"Hace 3 semanas",
+"Weekly summary":"Resumen semanal",
+"Sales by day of the week":"Ventas por día de la semana",
+"Best-selling items":"Lo más vendido",
+"Event nights":"Noches de evento",
+"Shopping list (reorder)":"Lista de compras (pedidos)"
+});
+
 /* ============ helpers ============ */
 const $ = (s, r=document) => r.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -182,11 +513,11 @@ const pad = n => String(n).padStart(2,"0");
 const key = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const parse = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
 const addDays = (d,n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()+n); return x; };
-const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const DOWL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const fmtDay = k => { const d = parse(k); return DOW[d.getDay()]+", "+MON[d.getMonth()].slice(0,3)+" "+d.getDate(); };
-const hourLabel = h => { const x = h%24; return (x%12||12) + (x<12?"a":"p"); };
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const shortDate = d => LANG==="es" ? d.getDate()+" "+MON[d.getMonth()].slice(0,3) : MON[d.getMonth()].slice(0,3)+" "+d.getDate();
+const longDate = d => LANG==="es" ? d.getDate()+" de "+MON[d.getMonth()] : cap(MON[d.getMonth()])+" "+d.getDate();
+const fmtDay = k => { const d = parse(k); return cap(DOW[d.getDay()])+(LANG==="es"?" ":", ")+shortDate(d); };
+const hourLabel = h => { const x = h%24; return (x%12||12) + (x<12?"am":"pm"); };
 const sum = a => a.reduce((s,x)=>s+x,0);
 const mean = a => a.length ? sum(a)/a.length : 0;
 const sd = a => { if(a.length<2) return 0; const m = mean(a); return Math.sqrt(mean(a.map(x=>(x-m)**2))); };
@@ -323,8 +654,8 @@ function eventMoney(ev, days, settings, fc){
 /* ============ saved data (events, inventory, cost assumptions) ============ */
 const LS = { get(k,d){ try{ const v = localStorage.getItem("korona:"+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem("korona:"+k, JSON.stringify(v)); return true; }catch(e){ return false; } } };
 const S = {local:false, tab:"overview", events:[], inv:[], settings:{cogsPct:27,laborPct:22,fixedWeek:0}, loaded:false, db:null, slow:false,
-  month:new Date(today.getFullYear(), today.getMonth(), 1), report:"ledger", weekBack:0, trendDay:"all", invFilter:"all"};
-const TABS = [["overview","Overview"],["reports","Reports"],["forecast","Forecast"],["trends","Trends"],["events","Events"],["inventory","Inventory"]];
+  month:new Date(today.getFullYear(), today.getMonth(), 1), report:"ledger", weekBack:0, trendDay:"all", invFilter:"all", help:{}};
+const TABS = [["overview","Overview"],["reports","Reports"],["forecast","Forecast"],["trends","Trends"],["events","Events"],["inventory","Inventory"]]; /* labels go through t() when drawn */
 let toastT;
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, 2600); }
 async function initStore(){
@@ -344,15 +675,15 @@ function saveLocal(path, data){
   const arr = col === "events" ? S.events : S.inv, row = {id, ...data}, i = arr.findIndex(x => x.id === id);
   if(i >= 0) arr[i] = row; else arr.push(row);
   arr.sort((a,b) => col === "events" ? a.date.localeCompare(b.date) : (a.cat+a.name).localeCompare(b.cat+b.name));
-  const ok = LS.set(col, arr); if(!ok) toast("This browser would not save the change."); render(); return ok;
+  const ok = LS.set(col, arr); if(!ok) toast(t("This browser would not save the change.")); render(); return ok;
 }
 async function save(path, data){
   if(!S.db) return saveLocal(path, data);
-  try { await S.db.doc(path).set(data); return true; } catch(e){ toast("Could not save. Check your access and try again."); return false; }
+  try { await S.db.doc(path).set(data); return true; } catch(e){ toast(t("Could not save. Check your access and try again.")); return false; }
 }
 async function remove(path){
   if(!S.db){ const [col, id] = path.split("/"); const arr = col === "events" ? S.events : S.inv; const i = arr.findIndex(x => x.id === id); if(i >= 0) arr.splice(i, 1); LS.set(col, arr); render(); return true; }
-  try { await S.db.doc(path).delete(); return true; } catch(e){ toast("Could not delete."); return false; }
+  try { await S.db.doc(path).delete(); return true; } catch(e){ toast(t("Could not delete.")); return false; }
 }
 function newId(col){ return S.db ? S.db.collection(col).doc().id : col[0]+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
@@ -360,33 +691,33 @@ function newId(col){ return S.db ? S.db.collection(col).doc().id : col[0]+Date.n
 function niceMax(v){ if(v<=0) return 100; const p = Math.pow(10, Math.floor(Math.log10(v))); for(const m of [1,1.5,2,2.5,3,4,5,6,8,10]) if(m*p >= v) return m*p; return 10*p; }
 const kfmt = v => v>=1000 ? "$"+(v/1000).toFixed(v%1000?1:0)+"k" : "$"+Math.round(v);
 function barChart(pts){
-  const W=720, H=250, L=46, R=8, T=14, B=40, iw=W-L-R, ih=H-T-B, max = niceMax(Math.max(1,...pts.map(p=>p.hi||p.v)));
+  const W=720, H=262, L=64, R=8, T=14, B=54, iw=W-L-R, ih=H-T-B, max = niceMax(Math.max(1,...pts.map(p=>p.hi||p.v)));
   const bw = iw/pts.length, y = v => T + ih - v/max*ih;
-  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily gross sales, last 14 days and next 7 days projected">`;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t("Daily sales: last 14 days and the next 7 days expected")}">`;
   [0,.5,1].forEach(f => { const v = max*f; s += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${kfmt(v)}</text>`; });
   pts.forEach((p,i) => {
     const x = L + i*bw + bw*.14, w = bw*.72, fut = p.kind==="fcst";
     s += `<rect x="${x.toFixed(1)}" y="${y(p.v).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(1,ih-(y(p.v)-T)).toFixed(1)}" rx="3" fill="${fut?"var(--accent)":"var(--series)"}" opacity="${fut?.85:1}"><title>${esc(p.tip)}</title></rect>`;
-    if(p.today) s += `<circle cx="${(x+w/2).toFixed(1)}" cy="${H-B+34}" r="3" fill="var(--accent)"/>`;
-    s += `<text x="${(x+w/2).toFixed(1)}" y="${H-B+14}" text-anchor="middle">${p.l1}</text><text x="${(x+w/2).toFixed(1)}" y="${H-B+27}" text-anchor="middle">${p.l2}</text>`;
+    if(p.today) s += `<circle cx="${(x+w/2).toFixed(1)}" cy="${H-B+49}" r="3.5" fill="var(--accent)"/>`;
+    s += `<text x="${(x+w/2).toFixed(1)}" y="${H-B+19}" text-anchor="middle">${p.l1}</text><text x="${(x+w/2).toFixed(1)}" y="${H-B+39}" text-anchor="middle">${p.l2}</text>`;
   });
   return s + `</svg>`;
 }
 function lineChart(act, fc){
-  const W=760, H=270, L=46, R=10, T=14, B=30, iw=W-L-R, ih=H-T-B, n = act.length+fc.length;
+  const W=760, H=280, L=64, R=10, T=16, B=34, iw=W-L-R, ih=H-T-B, n = act.length+fc.length;
   const max = niceMax(Math.max(...act.map(a=>a.v), ...fc.map(f=>f.hi)));
   const x = i => L + i/(n-1)*iw, y = v => T + ih - v/max*ih;
-  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily sales for the last 28 days and projected sales for the next 14 days">`;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t("Daily sales for the last 28 days and expected sales for the next 14 days")}">`;
   [0,.25,.5,.75,1].forEach(f => { const v = max*f; s += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${kfmt(v)}</text>`; });
   const sx = x(act.length-.5);
-  s += `<line x1="${sx}" x2="${sx}" y1="${T}" y2="${T+ih}" stroke="var(--ink2)" stroke-dasharray="3 4"/><text x="${sx+6}" y="${T+11}">today</text>`;
+  s += `<line x1="${sx}" x2="${sx}" y1="${T}" y2="${T+ih}" stroke="var(--ink2)" stroke-dasharray="3 4"/><text x="${sx+6}" y="${T+11}">${t("today")}</text>`;
   const band = fc.map((f,i)=>`${x(act.length+i).toFixed(1)},${y(f.hi).toFixed(1)}`).join(" ") + " " + fc.slice().reverse().map((f,i)=>`${x(n-1-i).toFixed(1)},${y(f.lo).toFixed(1)}`).join(" ");
   s += `<polygon points="${band}" fill="var(--accent)" opacity=".18"/>`;
   s += `<polyline fill="none" stroke="var(--series)" stroke-width="2.2" stroke-linejoin="round" points="${act.map((a,i)=>`${x(i).toFixed(1)},${y(a.v).toFixed(1)}`).join(" ")}"/>`;
   s += `<polyline fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-dasharray="6 4" stroke-linejoin="round" points="${fc.map((f,i)=>`${x(act.length+i).toFixed(1)},${y(f.mid).toFixed(1)}`).join(" ")}"/>`;
   fc.forEach((f,i) => { if(f.event) s += `<circle cx="${x(act.length+i).toFixed(1)}" cy="${y(f.mid).toFixed(1)}" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"><title>${esc(f.event.name)}</title></circle>`; });
   const lab = [0, 7, 14, 21, 28, 35, 41];
-  lab.forEach(i => { const d = i<act.length ? act[i].date : fc[i-act.length].date, dd = parse(d); s += `<text x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="${i===0?"start":i===n-1?"end":"middle"}">${MON[dd.getMonth()].slice(0,3)} ${dd.getDate()}</text>`; });
+  lab.forEach(i => { const d = i<act.length ? act[i].date : fc[i-act.length].date, dd = parse(d); s += `<text x="${x(i).toFixed(1)}" y="${H-9}" text-anchor="${i===0?"start":i===n-1?"end":"middle"}">${shortDate(dd)}</text>`; });
   return s + `</svg>`;
 }
 function spark(vals, w=88, h=26){
@@ -414,6 +745,32 @@ function itemTotals(days){
 }
 const priceOf = n => SALES.prices[n] || 0;
 
+/* ============ small shared pieces ============ */
+function help(tab, items){
+  return `<details class="help" data-help="${tab}" ${S.help[tab]?"open":""}><summary>${t("What am I looking at?")}</summary><ul>${items.map(i=>`<li>${t(i)}</li>`).join("")}</ul></details>`;
+}
+function plainSummary(days, fc, stock){
+  const out = [], y = days[days.length-1];
+  if(y){
+    const w = parse(y.date).getDay(), usual = mean(weekdayStats(days.slice(0,-1), 8)[w]), dn = DOWL[w];
+    if(y.gross <= 0) out.push(t("No sales were recorded yesterday ({day}).", {day:dn}));
+    else if(usual > 0){
+      const d = y.gross/usual - 1, a = money(y.gross), u = money(usual);
+      if(Math.abs(d) < .05) out.push(t("Yesterday ({day}) the bar sold {amt}. That is about a normal {day}.", {day:dn, amt:a}));
+      else if(d > 0) out.push(t("Yesterday ({day}) the bar sold {amt}. That is {p} more than a normal {day} (about {usual}).", {day:dn, amt:a, p:pct(d,0), usual:u}));
+      else out.push(t("Yesterday ({day}) the bar sold {amt}. That is {p} less than a normal {day} (about {usual}).", {day:dn, amt:a, p:pct(-d,0), usual:u}));
+    } else out.push(t("Yesterday ({day}) the bar sold {amt}.", {day:dn, amt:money(y.gross)}));
+  }
+  const f7 = sum(fc.slice(0,7).map(f=>f.mid));
+  if(f7 > 0) out.push(t("Over the next 7 days we expect about {amt} in sales.", {amt:money(f7)}));
+  const nx = S.events.filter(e=>e.date>=TODAY)[0];
+  if(nx) out.push(t("Next event: {name} on {day}.", {name:nx.name, day:fmtDay(nx.date)}));
+  if(!S.inv.length) out.push(t("Add your stock on the Inventory tab to get reorder reminders."));
+  else if(stock.length) out.push(pl(stock.length, "{n} item needs to be reordered.", "{n} items need to be reordered."));
+  else out.push(t("Nothing needs to be reordered right now."));
+  return out;
+}
+
 /* ============ overview ============ */
 function viewOverview(){
   const days = SALES.days(), last7 = days.slice(-7), prev7 = days.slice(-14,-7);
@@ -421,55 +778,58 @@ function viewOverview(){
   const fc = forecast(days, S.events, 14), f7 = sum(fc.slice(0,7).map(f=>f.mid));
   const a = days[days.length-1] ? weekNet(days, last7[0].date, last7[last7.length-1].date) : {net:0};
   const stock = S.inv.filter(i => invStatus(i)!=="ok"), outN = S.inv.filter(i=>invStatus(i)==="out").length;
-  const pts = days.slice(-14).map(d => ({v:d.gross, kind:"act", l1:DOW[parse(d.date).getDay()][0], l2:parse(d.date).getDate(), tip:fmtDay(d.date)+": "+money(d.gross)}))
-    .concat(fc.slice(0,7).map((f,i) => ({v:f.mid, hi:f.hi, kind:"fcst", today:i===0, l1:DOW[f.w][0], l2:parse(f.date).getDate(), tip:fmtDay(f.date)+": about "+money(f.mid)+(f.event?" ("+f.event.name+")":"")})));
+  const pts = days.slice(-14).map(d => ({v:d.gross, kind:"act", l1:DOW[parse(d.date).getDay()][0].toUpperCase(), l2:parse(d.date).getDate(), tip:fmtDay(d.date)+": "+money(d.gross)}))
+    .concat(fc.slice(0,7).map((f,i) => ({v:f.mid, hi:f.hi, kind:"fcst", today:i===0, l1:DOW[f.w][0].toUpperCase(), l2:parse(f.date).getDate(), tip:fmtDay(f.date)+": "+t("about")+" "+money(f.mid)+(f.event?" ("+f.event.name+")":"")})));
   const upcoming = S.events.filter(e=>e.date>=TODAY).slice(0,3);
   const tot = itemTotals(last7), top = Object.entries(tot).map(([n,q])=>[n,q,q*priceOf(n)]).sort((x,y)=>y[2]-x[2]).slice(0,5);
   const hr = Array(24).fill(0); days.slice(-28).forEach(d => d.hourly.forEach((v,h)=>{ hr[h]+=v; }));
   const bestH = hr.map((v,h)=>[h,v]).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>x[0]).sort((a,b)=>((a+20)%24)-((b+20)%24));
+  const lines = plainSummary(days, fc, stock);
   return `
-  <div class="head rise"><div><h2>${DOWL[today.getDay()]}, ${MON[today.getMonth()]} ${today.getDate()}</h2>
-    <p>Last 7 days, the week ahead, and what needs attention before the next busy night.</p></div></div>
+  <div class="head rise"><div><h2>${cap(DOWL[today.getDay()])}, ${longDate(today)}</h2>
+    <p>${t("A quick look at the last 7 days, the week ahead, and what needs your attention.")}</p></div></div>
   ${banner()}
+  <div class="card plain"><h3>${t("In plain words")}</h3><ul>${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></div>
+  ${help("overview", ["Total sales is everything rung up on Clover, before any costs are taken out.", "Profit after costs is an estimate: sales minus the cost of drinks, staff pay and event costs. You can change those percentages on the Reports tab.", "Orange means a guess about the future, or something that needs your attention."])}
   <div class="grid g4">
-    <div class="card stat"><span class="k">Gross sales, last 7 days</span><span class="v num">${money(g7)}</span><span class="s ${ch>=0?"pos":"neg"}">${ch>=0?"Up":"Down"} ${pct(Math.abs(ch),0)} vs the 7 days before</span></div>
-    <div class="card stat"><span class="k">Expected next 7 days</span><span class="v num proj">${money(f7)}</span><span class="s">Typical weekday pattern, adjusted for trend and events</span></div>
-    <div class="card stat"><span class="k">Net, last 7 days (est.)</span><span class="v num ${a.net>=0?"pos":"neg"}">${money(a.net)}</span><span class="s">After cost of goods, labor, event costs${S.settings.fixedWeek?" and fixed costs":""}</span></div>
-    <button class="card stat" style="text-align:left;cursor:pointer" data-go="inventory"><span class="k">Stock to reorder</span><span class="v num ${stock.length?"proj":""}">${S.inv.length?stock.length:"0"}</span><span class="s">${S.inv.length?(outN?outN+" out, ":"")+(stock.length-outN)+" below par":"Add items on the Inventory tab"}</span></button>
+    <div class="card stat"><span class="k">${t("Total sales, last 7 days")}</span><span class="v num">${money(g7)}</span><span class="s ${ch>=0?"pos":"neg"}">${ch>=0?t("Up {p} compared with the 7 days before",{p:pct(Math.abs(ch),0)}):t("Down {p} compared with the 7 days before",{p:pct(Math.abs(ch),0)})}</span></div>
+    <div class="card stat"><span class="k">${t("Expected sales, next 7 days")}</span><span class="v num proj">${money(f7)}</span><span class="s">${t("A guess based on your usual weekly pattern, the recent trend and any events")}</span></div>
+    <div class="card stat"><span class="k">${t("Profit after costs, last 7 days (estimate)")}</span><span class="v num ${a.net>=0?"pos":"neg"}">${money(a.net)}</span><span class="s">${S.settings.fixedWeek?t("After drinks cost, staff, event costs and fixed costs"):t("After drinks cost, staff and event costs")}</span></div>
+    <button class="card stat" style="text-align:left;cursor:pointer" data-go="inventory"><span class="k">${t("Items to reorder")}</span><span class="v num ${stock.length?"proj":""}">${S.inv.length?stock.length:"0"}</span><span class="s">${S.inv.length?(outN?t("{n} out of stock, ",{n:outN}):"")+t("{n} running low",{n:stock.length-outN}):t("Add items on the Inventory tab")}</span></button>
   </div>
   <div class="grid g21">
-    <div class="card"><div class="spread"><h3>Daily gross sales</h3><button class="link" data-go="forecast">See full forecast</button></div>
-      ${barChart(pts)}<div class="legend"><span><i style="background:var(--series)"></i>Sold</span><span><i style="background:var(--accent)"></i>Expected</span></div></div>
-    <div class="card"><div class="spread"><h3>Coming up</h3><button class="link" data-go="events">Schedule</button></div>
-      ${upcoming.length ? upcoming.map(e => { const m = eventMoney(e, days, S.settings, fc); return `<div style="padding:9px 0;border-top:1px solid var(--line)"><div class="spread"><b>${esc(e.name)}</b><span class="muted small">${fmtDay(e.date)}</span></div>
-        <div class="small muted">${esc(e.dj||"DJ not set")} &middot; costs ${money((+e.djFee||0)+(+e.otherCost||0))}</div>
-        <div class="small">${m.gross!=null?`Expected gross <b class="num">${money(m.gross)}</b>, net <b class="num ${m.net>=0?"pos":"neg"}">${money(m.net)}</b>`:""}</div></div>`; }).join("")
-        : `<div class="empty">No events scheduled yet. Add the next DJ night on the Events tab.</div>`}
+    <div class="card"><div class="spread"><h3>${t("Sales each day")}</h3><button class="link" data-go="forecast">${t("See the full forecast")}</button></div>
+      ${barChart(pts)}<div class="legend"><span><i style="background:var(--series)"></i>${t("Sold")}</span><span><i style="background:var(--accent)"></i>${t("Expected")}</span></div></div>
+    <div class="card"><div class="spread"><h3>${t("Coming up")}</h3><button class="link" data-go="events">${t("Schedule")}</button></div>
+      ${upcoming.length ? upcoming.map(e => { const m = eventMoney(e, days, S.settings, fc); return `<div style="padding:10px 0;border-top:1px solid var(--line)"><div class="spread"><b>${esc(e.name)}</b><span class="muted small">${fmtDay(e.date)}</span></div>
+        <div class="small muted">${esc(e.dj||t("DJ not set"))} &middot; ${t("costs {amt}",{amt:money((+e.djFee||0)+(+e.otherCost||0))})}</div>
+        <div class="small">${m.gross!=null?t("Expected sales")+` <b class="num">${money(m.gross)}</b>, ${t("profit")} <b class="num ${m.net>=0?"pos":"neg"}">${money(m.net)}</b>`:""}</div></div>`; }).join("")
+        : `<div class="empty">${t("No events scheduled yet. Add your next DJ night on the Events tab.")}</div>`}
     </div>
   </div>
   <div class="grid g2">
-    <div class="card"><div class="spread"><h3>Top sellers, last 7 days</h3><button class="link" data-go="trends">All trends</button></div>
-      <div class="tablewrap"><table><tbody>${top.map(t=>`<tr><td>${esc(t[0])}</td><td class="r num">${t[1]} sold</td><td class="r num">${money(t[2])}</td></tr>`).join("")}</tbody></table></div></div>
-    <div class="card"><h3>Busiest hours, last 4 weeks</h3>
-      <p>Most of your sales land at <b>${bestH.map(hourLabel).join(", ")}</b>. Staff and stock the bar ahead of that window.</p>
-      <p class="muted small" style="margin-top:8px">Based on ${money(sum(hr))} in sales across 28 days.</p></div>
+    <div class="card"><div class="spread"><h3>${t("Best sellers, last 7 days")}</h3><button class="link" data-go="trends">${t("All trends")}</button></div>
+      <div class="tablewrap"><table><tbody>${top.map(x=>`<tr><td>${esc(x[0])}</td><td class="r num">${t("{n} sold",{n:Math.round(x[1])})}</td><td class="r num">${money(x[2])}</td></tr>`).join("")}</tbody></table></div></div>
+    <div class="card"><h3>${t("Busiest hours, last 4 weeks")}</h3>
+      <p>${t("Most sales happen around")} <b>${bestH.map(hourLabel).join(", ")}</b>. ${t("Have staff and stock ready before then.")}</p>
+      <p class="muted small" style="margin-top:8px">${t("Based on {amt} in sales over 28 days.",{amt:money(sum(hr))})}</p></div>
   </div>`;
 }
 function banner(){
   const m = [];
-  if(SALES.state === "auth_error") m.push("<b>Clover rejected the token.</b> Check CLOVER_API_TOKEN and that it can read Orders, then restart the server.");
-  else if(SALES.state === "error") m.push("<b>Could not reach Clover.</b> Showing sample sales for now. " + esc(SALES.msg));
-  else if(SALES.state === "stale") m.push("<b>Clover could not be refreshed.</b> Showing the last sales that loaded. " + esc(SALES.msg));
-  else if(SALES.state === "not_configured") m.push("<b>Clover is not connected on the server.</b> Sales shown are sample data.");
-  else if(!SALES.live) m.push("<b>Sales shown are sample data.</b> Events, costs and inventory below are yours and are saved on this device.");
-  if(!S.db && S.loaded && !S.local) m.push("<b>Saving is off in this view.</b> Events and inventory will not be kept.");
-  if(S.slow) m.push("<b>Still loading saved data.</b> It may be out of date until the connection answers.");
+  if(SALES.state === "auth_error") m.push(t("<b>Clover rejected the access token.</b> Check CLOVER_API_TOKEN and make sure it can read Orders, then restart the server."));
+  else if(SALES.state === "error") m.push(t("<b>Could not reach Clover.</b> Showing sample sales for now.") + " " + esc(SALES.msg));
+  else if(SALES.state === "stale") m.push(t("<b>Clover could not be refreshed.</b> Showing the last sales that loaded.") + " " + esc(SALES.msg));
+  else if(SALES.state === "not_configured") m.push(t("<b>Clover is not connected on the server.</b> The sales shown are sample data."));
+  else if(!SALES.live) m.push(t("<b>The sales shown are sample data.</b> Events, costs and inventory you enter are real and are saved on this device."));
+  if(!S.db && S.loaded && !S.local) m.push(t("<b>Saving is off in this view.</b> Events and inventory will not be kept."));
+  if(S.slow) m.push(t("<b>Still loading saved data.</b> It may be out of date until the connection answers."));
   if(!m.length) return "";
-  return `<div class="banner"><span>${m.join(" ")}</span>${SALES.live?"":`<button class="link" data-act="connect">How to connect Clover</button>`}</div>`;
+  return `<div class="banner"><span>${m.join(" ")}</span>${SALES.live?"":`<button class="link" data-act="connect">${t("How to connect Clover")}</button>`}</div>`;
 }
 
 /* ============ reports ============ */
-const REPORTS = [["ledger","Weekly ledger"],["dow","Sales by day"],["items","Top items"],["events","Event nights"],["reorder","Reorder list"]];
+const REPORTS = [["ledger","Weekly summary"],["dow","Sales by day of the week"],["items","Best-selling items"],["events","Event nights"],["reorder","Shopping list (reorder)"]];
 function toCSV(cols, rows){
   const q = v => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
   return [cols.map(c=>q(c.label)).join(","), ...rows.map(r => cols.map(c=>q(r[c.k])).join(","))].join("\n");
@@ -479,59 +839,60 @@ function buildReport(){
   const days = SALES.days(), fc = forecast(days, S.events, 14);
   if(S.report === "ledger"){
     const {from,to} = weekRange(), w = weekNet(days, from, to), by = w.rows;
-    const cols = [{k:"day",label:"Day"},{k:"gross",label:"Gross sales",r:1,f:money},{k:"tx",label:"Transactions",r:1},{k:"ticket",label:"Average ticket",r:1,f:v=>money(v,2)},{k:"ev",label:"Event"}];
-    const rows = by.map(d => { const e = S.events.find(x=>x.date===d.date); return {day:fmtDay(d.date), gross:d.gross, tx:d.tx, ticket:+(d.gross/d.tx).toFixed(2), ev:e?e.name+(e.dj?" with "+e.dj:""):""}; });
+    const cols = [{k:"day",label:t("Day")},{k:"gross",label:t("Total sales"),r:1,f:money},{k:"tx",label:t("Number of sales"),r:1},{k:"ticket",label:t("Average sale"),r:1,f:v=>money(v,2)},{k:"ev",label:t("Event")}];
+    const rows = by.map(d => { const e = S.events.find(x=>x.date===d.date); return {day:fmtDay(d.date), gross:d.gross, tx:d.tx, ticket:d.tx?+(d.gross/d.tx).toFixed(2):0, ev:e?e.name+(e.dj?" "+t("with")+" "+e.dj:""):""}; });
     const ln = (a,b,cls="") => `<div class="ln"><span>${a}</span><span class="dots"></span><span class="num ${cls}">${b}</span></div>`;
-    const extra = `<div class="receipt"><div class="t">WEEKLY LEDGER</div><div class="sub">${fmtDay(from)} to ${fmtDay(to)}${S.weekBack===0?" (so far)":""}</div>
-      ${ln("Gross sales", money(w.gross))}${ln("Transactions", w.tx.toLocaleString("en-US"))}${ln("Average ticket", w.tx?money(w.gross/w.tx,2):"$0.00")}
+    const extra = `<div class="receipt"><div class="t">${t("WEEKLY SUMMARY")}</div><div class="sub">${fmtDay(from)} ${t("to")} ${fmtDay(to)}${S.weekBack===0?" "+t("(so far)"):""}</div>
+      ${ln(t("Total sales"), money(w.gross))}${ln(t("Number of sales"), w.tx.toLocaleString("en-US"))}${ln(t("Average sale"), w.tx?money(w.gross/w.tx,2):"$0.00")}
       <div style="height:8px"></div>
-      ${ln("Cost of goods ("+S.settings.cogsPct+"%)", "-"+money(w.cogs))}${ln("Labor ("+S.settings.laborPct+"%)", "-"+money(w.labor))}${ln("DJs and event costs", "-"+money(w.evc))}${S.settings.fixedWeek?ln("Fixed costs", "-"+money(w.fixed)):""}
-      <div class="ln tot"><span>NET ${w.net>=0?"PROFIT":"LOSS"}</span><span class="dots"></span><span class="num ${w.net>=0?"pos":"neg"}">${money(w.net)}</span></div></div>`;
-    return {cols, rows, extra, name:"weekly-ledger-"+from};
+      ${ln(t("Drinks and supplies ({n}%)",{n:S.settings.cogsPct}), "-"+money(w.cogs))}${ln(t("Staff pay ({n}%)",{n:S.settings.laborPct}), "-"+money(w.labor))}${ln(t("DJs and event costs"), "-"+money(w.evc))}${S.settings.fixedWeek?ln(t("Other fixed costs"), "-"+money(w.fixed)):""}
+      <div class="ln tot"><span>${w.net>=0?t("PROFIT"):t("LOSS")}</span><span class="dots"></span><span class="num ${w.net>=0?"pos":"neg"}">${money(w.net)}</span></div></div>`;
+    return {cols, rows, extra, name:"weekly-summary-"+from};
   }
   if(S.report === "dow"){
     const by = weekdayStats(days, 8), tot = sum([0,1,2,3,4,5,6].map(w=>mean(by[w])));
-    const cols = [{k:"day",label:"Day"},{k:"avg",label:"Average gross",r:1,f:money},{k:"best",label:"Best",r:1,f:money},{k:"worst",label:"Slowest",r:1,f:money},{k:"share",label:"Share of week",r:1,f:v=>pct(v,0)}];
-    const rows = [1,2,3,4,5,6,0].map(w => ({day:DOWL[w], avg:Math.round(mean(by[w])), best:Math.max(...by[w]), worst:Math.min(...by[w]), share:mean(by[w])/tot}));
-    return {cols, rows, extra:`<p class="muted">Normal nights over the last 8 weeks. Event nights are left out so they do not inflate the averages.</p>`, name:"sales-by-day"};
+    const cols = [{k:"day",label:t("Day")},{k:"avg",label:t("Usual sales"),r:1,f:money},{k:"best",label:t("Best night"),r:1,f:money},{k:"worst",label:t("Slowest night"),r:1,f:money},{k:"share",label:t("Share of the week"),r:1,f:v=>pct(v,0)}];
+    const rows = [1,2,3,4,5,6,0].map(w => ({day:cap(DOWL[w]), avg:Math.round(mean(by[w])), best:Math.max(0,...by[w]), worst:by[w].length?Math.min(...by[w]):0, share:tot?mean(by[w])/tot:0}));
+    return {cols, rows, extra:`<p class="muted">${t("Normal nights over the last 8 weeks. Event nights are left out so they do not make the averages look too high.")}</p>`, name:"sales-by-day"};
   }
   if(S.report === "items"){
     const a = itemTotals(days.slice(-28)), b = itemTotals(days.slice(-56,-28)), tr = sum(Object.entries(a).map(([n,q])=>q*priceOf(n)));
-    const cols = [{k:"item",label:"Item"},{k:"units",label:"Units, 28 days",r:1},{k:"rev",label:"Revenue",r:1,f:money},{k:"share",label:"Share",r:1,f:v=>pct(v,0)},{k:"chg",label:"Units vs prior 28",r:1,f:v=>(v>=0?"+":"")+pct(v,0)}];
-    const rows = Object.keys(a).map(n => ({item:n, units:a[n], rev:a[n]*priceOf(n), share:a[n]*priceOf(n)/tr, chg:b[n]?a[n]/b[n]-1:0})).sort((x,y)=>y.rev-x.rev);
-    return {cols, rows, extra:"", name:"top-items"};
+    const cols = [{k:"item",label:t("Item")},{k:"units",label:t("Sold, last 28 days"),r:1},{k:"rev",label:t("Money made"),r:1,f:money},{k:"share",label:t("Share of sales"),r:1,f:v=>pct(v,0)},{k:"chg",label:t("Change vs the 28 days before"),r:1,f:v=>(v>=0?"+":"")+pct(v,0)}];
+    const rows = Object.keys(a).map(n => ({item:n, units:Math.round(a[n]), rev:a[n]*priceOf(n), share:tr?a[n]*priceOf(n)/tr:0, chg:b[n]?a[n]/b[n]-1:0})).sort((x,y)=>y.rev-x.rev);
+    return {cols, rows, extra:"", name:"best-selling-items"};
   }
   if(S.report === "events"){
     const past = S.events.filter(e=>e.date<TODAY).slice().reverse();
-    const cols = [{k:"date",label:"Date"},{k:"name",label:"Event"},{k:"dj",label:"DJ"},{k:"gross",label:"Gross",r:1,f:money},{k:"cost",label:"DJ + other costs",r:1,f:money},{k:"net",label:"Net for the night",r:1,f:v=>v==null?"":money(v)},{k:"paid",label:"Paid for itself",r:1,f:v=>v==null?"":moneyS(v)}];
+    const cols = [{k:"date",label:t("Date")},{k:"name",label:t("Event")},{k:"dj",label:t("DJ")},{k:"gross",label:t("Sales"),r:1,f:money},{k:"cost",label:t("DJ and other costs"),r:1,f:money},{k:"net",label:t("Profit for the night"),r:1,f:v=>v==null?"":money(v)},{k:"paid",label:t("Worth it? (vs a normal night)"),r:1,f:v=>v==null?"":moneyS(v)}];
     const rows = past.map(e => { const m = eventMoney(e, days, S.settings, fc); return {date:e.date, name:e.name, dj:e.dj||"", gross:m.gross==null?"":Math.round(m.gross), cost:m.cost, net:m.net==null?null:Math.round(m.net), paid:m.paid==null?null:Math.round(m.paid)}; });
-    return {cols, rows, extra:`<p class="muted">"Paid for itself" is the extra sales over a normal night of that weekday, after cost of goods, minus the DJ and event costs.</p>`, name:"event-nights"};
+    return {cols, rows, extra:`<p class="muted">${t("Worth it? compares the night with a normal night on the same day of the week: the extra sales (after the cost of drinks) minus the DJ and event costs. Plus means the event paid for itself.")}</p>`, name:"event-nights"};
   }
-  const cols = [{k:"item",label:"Item"},{k:"cat",label:"Category"},{k:"onHand",label:"On hand",r:1},{k:"par",label:"Par",r:1},{k:"inc",label:"On order",r:1},{k:"need",label:"Order to reach par",r:1},{k:"cost",label:"Estimated cost",r:1,f:money}];
+  const cols = [{k:"item",label:t("Item")},{k:"cat",label:t("Category")},{k:"onHand",label:t("On hand"),r:1},{k:"par",label:t("Keep at least"),r:1},{k:"inc",label:t("On order"),r:1},{k:"need",label:t("Order this many"),r:1},{k:"cost",label:t("Estimated cost"),r:1,f:money}];
   const rows = S.inv.map(i => ({i, need:Math.max(0, (+i.par||0)-(+i.onHand||0)-(+i.incomingQty||0))})).filter(x=>x.need>0)
     .map(({i,need}) => ({item:i.name, cat:i.cat, onHand:+i.onHand||0, par:+i.par||0, inc:+i.incomingQty||0, need, cost:need*(+i.cost||0)}));
-  return {cols, rows, extra:rows.length?`<p class="muted">Estimated total: <b class="num">${money(sum(rows.map(r=>r.cost)))}</b></p>`:"", name:"reorder-list"};
+  return {cols, rows, extra:rows.length?`<p class="muted">${t("Estimated total:")} <b class="num">${money(sum(rows.map(r=>r.cost)))}</b></p>`:"", name:"reorder-list"};
 }
 function viewReports(){
-  const r = buildReport();
+  const r = buildReport(), title = t(REPORTS.find(x=>x[0]===S.report)[1]);
   const tbl = r.rows.length ? `<div class="tablewrap"><table><thead><tr>${r.cols.map(c=>`<th class="${c.r?"r":""}">${esc(c.label)}</th>`).join("")}</tr></thead><tbody>${r.rows.map(row=>`<tr>${r.cols.map(c=>{ const v = row[c.k]; return `<td class="${c.r?"r num":""}">${esc(c.f ? c.f(v) : v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`
-    : `<div class="empty">${S.report==="reorder"?"Everything is at or above par.":S.report==="events"?"No past events yet. Add them on the Events tab.":"Nothing to show for this period."}</div>`;
+    : `<div class="empty">${S.report==="reorder"?t("Everything is at or above the minimum. Nothing to order."):S.report==="events"?t("No past events yet. Add them on the Events tab."):t("Nothing to show for this period.")}</div>`;
   return `
-  <div class="head rise"><div><h2>Reports</h2><p>Pick a report, then download it as a spreadsheet file. Costs use the percentages below, so set them to match your books.</p></div>
-    <button class="btn primary" data-act="csv">Download CSV</button></div>
+  <div class="head rise"><div><h2>${t("Reports")}</h2><p>${t("Pick a report, then download it as a spreadsheet file. Costs use the percentages at the bottom of this page, so set them to match your books.")}</p></div>
+    <button class="btn primary" data-act="csv">${t("Download spreadsheet")}</button></div>
   ${banner()}
-  <div class="seg" role="group" aria-label="Report type">${REPORTS.map(([k,l])=>`<button aria-pressed="${S.report===k}" data-report="${k}">${l}</button>`).join("")}</div>
-  ${S.report==="ledger"?`<div class="seg" role="group" aria-label="Week" style="align-self:flex-start">${["This week","Last week","2 weeks ago","3 weeks ago"].map((l,i)=>`<button aria-pressed="${S.weekBack===i}" data-week="${i}">${l}</button>`).join("")}</div>`:""}
+  ${help("reports", ["Pick a report from the buttons below. The table updates right away.", "Tap Download spreadsheet to save the report as a CSV file that opens in Excel or Google Sheets.", "Profit numbers use the cost percentages at the bottom of this page. Change them to match your real costs."])}
+  <div class="seg" role="group" aria-label="${t("Report type")}">${REPORTS.map(([k,l])=>`<button aria-pressed="${S.report===k}" data-report="${k}">${t(l)}</button>`).join("")}</div>
+  ${S.report==="ledger"?`<div class="seg" role="group" aria-label="${t("Week")}" style="align-self:flex-start">${["This week","Last week","2 weeks ago","3 weeks ago"].map((l,i)=>`<button aria-pressed="${S.weekBack===i}" data-week="${i}">${t(l)}</button>`).join("")}</div>`:""}
   <div class="grid ${S.report==="ledger"?"g2":""}">
     ${S.report==="ledger"?`<div>${r.extra}</div>`:""}
-    <div class="card">${S.report==="ledger"?"<h3>Day by day</h3>":`<h3>${REPORTS.find(x=>x[0]===S.report)[1]}</h3>`}${tbl}${S.report!=="ledger"?`<div style="margin-top:10px">${r.extra}</div>`:""}</div>
+    <div class="card">${S.report==="ledger"?`<h3>${t("Day by day")}</h3>`:`<h3>${title}</h3>`}${tbl}${S.report!=="ledger"?`<div style="margin-top:10px">${r.extra}</div>`:""}</div>
   </div>
-  <div class="card"><h3>Cost assumptions</h3>
+  <div class="card"><h3>${t("Your cost estimates")}</h3>
     <div class="fgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-      <div class="field"><label for="s-cogs">Cost of goods, % of sales</label><input id="s-cogs" type="number" min="0" max="100" step="0.5" value="${S.settings.cogsPct}" data-set="cogsPct"></div>
-      <div class="field"><label for="s-labor">Labor, % of sales</label><input id="s-labor" type="number" min="0" max="100" step="0.5" value="${S.settings.laborPct}" data-set="laborPct"></div>
-      <div class="field"><label for="s-fixed">Other fixed costs per week ($)</label><input id="s-fixed" type="number" min="0" step="10" value="${S.settings.fixedWeek}" data-set="fixedWeek"></div>
-    </div><p class="muted small" style="margin-top:10px">Rent, utilities and insurance can go in fixed costs. These are estimates until your real costs come from your books or Clover.</p></div>`;
+      <div class="field"><label for="s-cogs">${t("Drinks and supplies, % of sales")}</label><input id="s-cogs" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="${S.settings.cogsPct}" data-set="cogsPct"></div>
+      <div class="field"><label for="s-labor">${t("Staff pay, % of sales")}</label><input id="s-labor" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="${S.settings.laborPct}" data-set="laborPct"></div>
+      <div class="field"><label for="s-fixed">${t("Other costs per week ($)")}</label><input id="s-fixed" type="number" inputmode="decimal" min="0" step="10" value="${S.settings.fixedWeek}" data-set="fixedWeek"></div>
+    </div><p class="muted small" style="margin-top:10px">${t("Rent, utilities and insurance can go under other costs. These are estimates until you enter your real costs.")}</p></div>`;
 }
 
 /* ============ forecast ============ */
@@ -540,24 +901,26 @@ function viewForecast(){
   const dayNet = f => { const c = costs(S.settings, f.mid), ec = f.event ? (+f.event.djFee||0)+(+f.event.otherCost||0) : 0; return f.mid - c.cogs - c.labor - ec - S.settings.fixedWeek/7; };
   const f7 = sum(fc.slice(0,7).map(f=>f.mid)), f14 = sum(fc.map(f=>f.mid)), n7 = sum(fc.slice(0,7).map(dayNet));
   const err = backtest(days), g = growthFactor(days), l7 = sum(days.slice(-7).map(d=>d.gross));
+  const trend = g>1.005 ? t("Trend: up {p}.",{p:pct(g-1,1)}) : g<.995 ? t("Trend: down {p}.",{p:pct(1-g,1)}) : t("Trend: flat.");
   return `
-  <div class="head rise"><div><h2>Forecast</h2><p>What you should expect to make each night, based on the same weekday over the last 8 weeks, the 4-week trend, and any events you have scheduled.</p></div></div>
+  <div class="head rise"><div><h2>${t("Forecast")}</h2><p>${t("What you can expect to make each night. It looks at the same day of the week over the last 8 weeks, the recent trend, and any events you scheduled.")}</p></div></div>
   ${banner()}
+  ${help("forecast", ["The forecast is a smart guess, not a promise.", "It starts from what you usually make on that day of the week, then adjusts for whether sales have been going up or down lately.", "Days with a scheduled event get a boost, based on how your past events did.", "The shaded band on the chart is the range we think is likely. Holidays and weather are not included."])}
   <div class="grid g4">
-    <div class="card stat"><span class="k">Next 7 days</span><span class="v num proj">${money(f7)}</span><span class="s">${l7?(f7>=l7?"Up ":"Down ")+pct(Math.abs(f7/l7-1),0)+" vs the last 7 days":""}</span></div>
-    <div class="card stat"><span class="k">Next 14 days</span><span class="v num proj">${money(f14)}</span><span class="s">Gross sales</span></div>
-    <div class="card stat"><span class="k">Net next 7 days (est.)</span><span class="v num ${n7>=0?"pos":"neg"}">${money(n7)}</span><span class="s">After costs and scheduled events</span></div>
-    <div class="card stat"><span class="k">Recent miss</span><span class="v num">${err==null?"n/a":pct(err,0)}</span><span class="s">Average error on the last 4 weeks. ${g>1.005?"Trend: up "+pct(g-1,1)+".":g<.995?"Trend: down "+pct(1-g,1)+".":"Trend: flat."}</span></div>
+    <div class="card stat"><span class="k">${t("Next 7 days")}</span><span class="v num proj">${money(f7)}</span><span class="s">${l7?(f7>=l7?t("Up {p} compared with the last 7 days",{p:pct(Math.abs(f7/l7-1),0)}):t("Down {p} compared with the last 7 days",{p:pct(Math.abs(f7/l7-1),0)})):""}</span></div>
+    <div class="card stat"><span class="k">${t("Next 14 days")}</span><span class="v num proj">${money(f14)}</span><span class="s">${t("Total sales")}</span></div>
+    <div class="card stat"><span class="k">${t("Profit, next 7 days (estimate)")}</span><span class="v num ${n7>=0?"pos":"neg"}">${money(n7)}</span><span class="s">${t("After costs and scheduled events")}</span></div>
+    <div class="card stat"><span class="k">${t("How far off the guess was")}</span><span class="v num">${err==null?t("n/a"):pct(err,0)}</span><span class="s">${t("Average miss over the last 4 weeks.")} ${trend}</span></div>
   </div>
-  <div class="card"><h3>Sold and expected</h3>${lineChart(act, fc)}
-    <div class="legend"><span><i style="background:var(--series)"></i>Sold</span><span><i style="background:var(--accent)"></i>Expected</span><span><i style="background:var(--accent);opacity:.25"></i>Likely range</span><span>Dots mark scheduled events</span></div></div>
-  <div class="card"><h3>Next 14 days</h3><div class="tablewrap"><table>
-    <thead><tr><th>Day</th><th>Event</th><th class="r">Expected gross</th><th class="r">Likely range</th><th class="r">Costs</th><th class="r">Expected net</th></tr></thead><tbody>
+  <div class="card"><h3>${t("Sold and expected")}</h3>${lineChart(act, fc)}
+    <div class="legend"><span><i style="background:var(--series)"></i>${t("Sold")}</span><span><i style="background:var(--accent)"></i>${t("Expected")}</span><span><i style="background:var(--accent);opacity:.25"></i>${t("Likely range")}</span><span>${t("Dots mark scheduled events")}</span></div></div>
+  <div class="card"><h3>${t("Next 14 days")}</h3><div class="tablewrap"><table>
+    <thead><tr><th>${t("Day")}</th><th>${t("Event")}</th><th class="r">${t("Expected sales")}</th><th class="r">${t("Likely range")}</th><th class="r">${t("Costs")}</th><th class="r">${t("Expected profit")}</th></tr></thead><tbody>
     ${fc.map(f => { const n = dayNet(f), ec = f.event ? (+f.event.djFee||0)+(+f.event.otherCost||0) : 0, c = costs(S.settings, f.mid);
-      return `<tr><td>${fmtDay(f.date)}${f.date===TODAY?` <span class="pill warn">Today</span>`:""}</td><td>${f.event?esc(f.event.name)+(f.event.dj?`<span class="muted"> with ${esc(f.event.dj)}</span>`:""):`<span class="muted">None</span>`}</td>
-      <td class="r num"><b>${money(f.mid)}</b></td><td class="r num muted">${money(f.lo)} to ${money(f.hi)}</td><td class="r num">${money(c.cogs+c.labor+ec+S.settings.fixedWeek/7)}</td><td class="r num ${n>=0?"pos":"neg"}">${money(n)}</td></tr>`; }).join("")}
+      return `<tr><td>${fmtDay(f.date)}${f.date===TODAY?` <span class="pill warn">${t("Today")}</span>`:""}</td><td>${f.event?esc(f.event.name)+(f.event.dj?`<span class="muted"> ${t("with")} ${esc(f.event.dj)}</span>`:""):`<span class="muted">${t("None")}</span>`}</td>
+      <td class="r num"><b>${money(f.mid)}</b></td><td class="r num muted">${money(f.lo)} ${t("to")} ${money(f.hi)}</td><td class="r num">${money(c.cogs+c.labor+ec+S.settings.fixedWeek/7)}</td><td class="r num ${n>=0?"pos":"neg"}">${money(n)}</td></tr>`; }).join("")}
     </tbody></table></div></div>
-  <div class="card"><h3>How the number is built</h3><p style="max-width:70ch">Each day starts from the average of that weekday over the last 8 weeks, then is scaled by how the last 4 weeks compare with the 4 before. A scheduled event lifts the day by the average bump your past events produced (${pct(eventUplift(days, S.events.filter(e=>e.date<TODAY))-1,0)} right now). The range is one standard step either side of that weekday's usual swing. Holidays and weather are not modeled, so treat big holiday weekends as a floor you can beat or miss.</p></div>`;
+  <div class="card"><h3>${t("How the number is built")}</h3><p style="max-width:70ch">${t("Each day starts from the average of that day of the week over the last 8 weeks, then is adjusted by how the last 4 weeks compare with the 4 before. A scheduled event lifts the day by the average boost your past events gave ({p} right now). The range shows the usual ups and downs for that day. Holidays and weather are not included, so treat big holiday weekends as a floor you can beat or miss.",{p:pct(eventUplift(days, S.events.filter(e=>e.date<TODAY))-1,0)})}</p></div>`;
 }
 
 /* ============ trends ============ */
@@ -566,14 +929,14 @@ function viewTrends(){
   const days = SALES.days(), recent = days.slice(-56), order = [1,2,3,4,5,6,0];
   const avgHW = (w, h) => { const rows = recent.filter(d => parse(d.date).getDay()===w); return mean(rows.map(d=>d.hourly[h])); };
   let mx = 1; order.forEach(w => HCOLS.forEach(h => { mx = Math.max(mx, avgHW(w,h)); }));
-  const heat = `<div class="heat" style="grid-template-columns:44px repeat(${HCOLS.length},minmax(0,1fr))"><span></span>${HCOLS.map(h=>`<span class="lab hl">${hourLabel(h)}</span>`).join("")}
-    ${order.map(w => `<span class="lab">${DOW[w]}</span>` + HCOLS.map(h => { const v = avgHW(w,h), p = Math.round(v/mx*100);
-      return `<span class="cell" style="background:color-mix(in srgb,var(--heat1) ${p}%,var(--heat0));color:${p>50?"var(--bg)":"var(--ink)"}" title="${DOW[w]} ${hourLabel(h)}: about ${money(v)}">${v>=1?kfmt(v):""}</span>`; }).join("")).join("")}</div>`;
+  const heat = `<div class="heat" style="grid-template-columns:48px repeat(${HCOLS.length},minmax(0,1fr))"><span></span>${HCOLS.map(h=>`<span class="lab hl">${hourLabel(h)}</span>`).join("")}
+    ${order.map(w => `<span class="lab">${cap(DOW[w])}</span>` + HCOLS.map(h => { const v = avgHW(w,h), p = Math.round(v/mx*100);
+      return `<span class="cell" style="background:color-mix(in srgb,var(--heat1) ${p}%,var(--heat0));color:${p>50?"var(--bg)":"var(--ink)"}" title="${cap(DOW[w])} ${hourLabel(h)}: ${t("about")} ${money(v)}">${v>=1?kfmt(v):""}</span>`; }).join("")).join("")}</div>`;
   const sel = S.trendDay, selDays = sel==="all" ? recent : recent.filter(d => parse(d.date).getDay()===+sel);
   const hv = HCOLS.map(h => mean(selDays.map(d=>d.hourly[h])));
-  const hp = HCOLS.map((h,i) => ({v:hv[i], kind:"act", l1:hourLabel(h), l2:"", tip:hourLabel(h)+": about "+money(hv[i])+" per night"}));
+  const hp = HCOLS.map((h,i) => ({v:hv[i], kind:"act", l1:hourLabel(h), l2:"", tip:hourLabel(h)+": "+t("about {amt} per night",{amt:money(hv[i])})}));
   const top3 = HCOLS.map((h,i)=>[h,hv[i]]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
-  const near = (() => { const t = top3.slice().sort((a,b)=>((a+20)%24)-((b+20)%24)); return t.map(hourLabel).join(", "); })();
+  const near = top3.slice().sort((a,b)=>((a+20)%24)-((b+20)%24)).map(hourLabel).join(", ");
   const wk = i => days.slice(-(i+1)*7, days.length-i*7);
   const weeks = [11,10,9,8,7,6,5,4,3,2,1,0].map(wk);
   const rows = Object.keys(SALES.prices).map(n => {
@@ -581,16 +944,17 @@ function viewTrends(){
     return {n, series, a, b, ch, rev:a*SALES.prices[n]};
   }).filter(r => r.a + r.b >= 8).sort((x,y)=>y.rev-x.rev).slice(0,20).sort((x,y)=>y.ch-x.ch);
   return `
-  <div class="head rise"><div><h2>Trends</h2><p>When the bar is busiest and which drinks are gaining or losing ground.</p></div></div>
+  <div class="head rise"><div><h2>${t("Trends")}</h2><p>${t("When the bar is busiest, and which drinks are selling more or less than before.")}</p></div></div>
   ${banner()}
-  <div class="card"><div class="spread"><h3>Busiest hours</h3><span class="muted small">Average sales per hour, last 8 weeks</span></div><div class="tablewrap">${heat}</div></div>
-  <div class="card"><div class="spread"><h3>Hour by hour</h3>
-    <div class="seg" role="group" aria-label="Day filter"><button aria-pressed="${sel==="all"}" data-tday="all">All</button>${order.map(w=>`<button aria-pressed="${sel==w}" data-tday="${w}">${DOW[w]}</button>`).join("")}</div></div>
-    ${barChart(hp)}<p style="margin-top:8px">${sel==="all"?"Across the week":"On "+DOWL[+sel]+"s"}, the money is made around <b>${near}</b>.</p></div>
-  <div class="card"><div class="spread"><h3>Drinks gaining and losing</h3><span class="muted small">Last 4 weeks vs the 4 before</span></div>
-    <div class="tablewrap"><table><thead><tr><th>Drink</th><th>12-week units</th><th class="r">Units, 4 weeks</th><th class="r">Change</th><th class="r">Revenue</th><th></th></tr></thead><tbody>
-    ${rows.map(r => `<tr><td>${esc(r.n)}</td><td>${spark(r.series)}</td><td class="r num">${r.a}</td><td class="r num ${r.ch>.02?"pos":r.ch<-.02?"neg":""}">${r.ch>=0?"+":""}${pct(r.ch,0)}</td><td class="r num">${money(r.rev)}</td>
-      <td>${r.ch>.08?`<span class="pill good">Rising</span>`:r.ch<-.08?`<span class="pill bad">Falling</span>`:`<span class="pill">Steady</span>`}</td></tr>`).join("")}
+  ${help("trends", ["In the hour chart, a darker square means more sales in that hour.", "Hours go from 4 pm to 3 am. Find your busiest day and hour to plan staff and stock.", "The drinks table compares the last 4 weeks with the 4 weeks before, so you can see what is selling more or less."])}
+  <div class="card"><div class="spread"><h3>${t("Busiest hours")}</h3><span class="muted small">${t("Average sales per hour, last 8 weeks")}</span></div><div class="tablewrap">${heat}</div></div>
+  <div class="card"><div class="spread"><h3>${t("Hour by hour")}</h3>
+    <div class="seg" role="group" aria-label="${t("Day filter")}"><button aria-pressed="${sel==="all"}" data-tday="all">${t("All")}</button>${order.map(w=>`<button aria-pressed="${sel==w}" data-tday="${w}">${cap(DOW[w])}</button>`).join("")}</div></div>
+    ${barChart(hp)}<p style="margin-top:8px">${sel==="all"?t("Across the whole week"):t("On {day}",{day:DOWP[+sel]})}, ${t("most of the money is made around")} <b>${near}</b>.</p></div>
+  <div class="card"><div class="spread"><h3>${t("Drinks selling more or less")}</h3><span class="muted small">${t("Last 4 weeks compared with the 4 before")}</span></div>
+    <div class="tablewrap"><table><thead><tr><th>${t("Drink")}</th><th>${t("Last 12 weeks")}</th><th class="r">${t("Sold, last 4 weeks")}</th><th class="r">${t("Change")}</th><th class="r">${t("Money made")}</th><th></th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.n)}</td><td>${spark(r.series)}</td><td class="r num">${Math.round(r.a)}</td><td class="r num ${r.ch>.02?"pos":r.ch<-.02?"neg":""}">${r.ch>=0?"+":""}${pct(r.ch,0)}</td><td class="r num">${money(r.rev)}</td>
+      <td>${r.ch>.08?`<span class="pill good">${t("Selling more")}</span>`:r.ch<-.08?`<span class="pill bad">${t("Selling less")}</span>`:`<span class="pill">${t("Steady")}</span>`}</td></tr>`).join("")}
     </tbody></table></div></div>`;
 }
 
@@ -604,60 +968,62 @@ function viewEvents(){
   let cells = "";
   for(let i=0;i<42;i++){
     const d = addDays(start,i), k = key(d), evs = S.events.filter(e=>e.date===k);
-    cells += `<div class="day ${d.getMonth()!==m.getMonth()?"out":""} ${k===TODAY?"today":""}" tabindex="0" role="button" data-cal="${k}" aria-label="${fmtDay(k)}${evs.length?", "+evs.map(e=>e.name).join(", "):", add event"}"><span class="dn">${d.getDate()}</span>
+    cells += `<div class="day ${d.getMonth()!==m.getMonth()?"out":""} ${k===TODAY?"today":""}" tabindex="0" role="button" data-cal="${k}" aria-label="${fmtDay(k)}${evs.length?", "+evs.map(e=>e.name).join(", "):", "+t("add an event")}"><span class="dn">${d.getDate()}</span>
       ${evs.map(e => { const x = ml(e), cl = e.date>=TODAY?"future":(x.net!=null&&x.net<0?"loss":""); return `<span class="chip ${cl}" data-ev="${esc(e.id)}" title="${esc(e.name)}">${esc(e.name)}${e.dj?" &middot; "+esc(e.dj):""}</span>`; }).join("")}</div>`;
   }
   const sorted = [...S.events.filter(e=>e.date>=TODAY), ...S.events.filter(e=>e.date<TODAY).reverse()];
   const hasSamples = S.events.some(e=>e.sample);
+  const netSum = sum(p30.map(x=>x.m.net));
   return `
-  <div class="head rise"><div><h2>Events</h2><p>Schedule each night, who is DJing and what it costs. Gross comes from your sales for that date, and the net is after cost of goods, labor and the event costs.</p></div>
-    <div class="row">${hasSamples?`<button class="btn" data-act="clear-events">Remove sample events</button>`:""}<button class="btn primary" data-act="add-event">Add event</button></div></div>
+  <div class="head rise"><div><h2>${t("Events")}</h2><p>${t("Schedule each night, who is DJing and what it costs. Sales come from your Clover sales for that date. Profit is sales minus drinks cost, staff pay and the event costs.")}</p></div>
+    <div class="row">${hasSamples?`<button class="btn" data-act="clear-events">${t("Remove sample events")}</button>`:""}<button class="btn primary" data-act="add-event">${t("Add event")}</button></div></div>
   ${banner()}
+  ${help("events", ["Tap Add event, or tap any day on the calendar, to schedule a night with the DJ and what it costs.", "Profit for the night is sales minus the cost of drinks, staff pay, and the DJ and event costs.", "On the calendar, green means the night made money and red means it lost money. Orange is coming up.", "Worth it? tells you if the event brought in more than a normal night would have, after its costs."])}
   <div class="grid g4">
-    <div class="card stat"><span class="k">Events, next 30 days</span><span class="v num">${in30.length}</span><span class="s">${in30.length?"Costs "+money(sum(in30.map(e=>(+e.djFee||0)+(+e.otherCost||0)))):"Nothing scheduled"}</span></div>
-    <div class="card stat"><span class="k">Net from events, last 30 days</span><span class="v num ${sum(p30.map(x=>x.m.net))>=0?"pos":"neg"}">${money(sum(p30.map(x=>x.m.net)))}</span><span class="s">${p30.length} event night${p30.length===1?"":"s"}</span></div>
-    <div class="card stat"><span class="k">Paid for themselves</span><span class="v num">${p30.length?paid+" of "+p30.length:"n/a"}</span><span class="s">Extra sales beat the event costs</span></div>
-    <div class="card stat"><span class="k">DJ + event spend, last 30 days</span><span class="v num">${money(sum(p30.map(x=>x.m.cost)))}</span><span class="s">Across ${p30.length} night${p30.length===1?"":"s"}</span></div>
+    <div class="card stat"><span class="k">${t("Events in the next 30 days")}</span><span class="v num">${in30.length}</span><span class="s">${in30.length?t("Costs {amt}",{amt:money(sum(in30.map(e=>(+e.djFee||0)+(+e.otherCost||0))))}):t("Nothing scheduled")}</span></div>
+    <div class="card stat"><span class="k">${t("Profit from events, last 30 days")}</span><span class="v num ${netSum>=0?"pos":"neg"}">${money(netSum)}</span><span class="s">${pl(p30.length,"{n} event night","{n} event nights")}</span></div>
+    <div class="card stat"><span class="k">${t("Events that were worth it")}</span><span class="v num">${p30.length?t("{a} of {b}",{a:paid,b:p30.length}):t("n/a")}</span><span class="s">${t("Brought in more than the event cost")}</span></div>
+    <div class="card stat"><span class="k">${t("DJ and event spending, last 30 days")}</span><span class="v num">${money(sum(p30.map(x=>x.m.cost)))}</span><span class="s">${pl(p30.length,"Across {n} night","Across {n} nights")}</span></div>
   </div>
-  <div class="card"><div class="spread"><h3>${MON[m.getMonth()]} ${m.getFullYear()}</h3>
-    <div class="row"><button class="btn sm" data-act="month-prev" aria-label="Previous month">Previous</button><button class="btn sm" data-act="month-today">This month</button><button class="btn sm" data-act="month-next" aria-label="Next month">Next</button></div></div>
-    <div class="tablewrap"><div class="cal">${DOW.map(d=>`<span class="dow">${d}</span>`).join("")}${cells}</div></div>
-    <div class="legend"><span><i style="background:var(--accent-soft)"></i>Upcoming</span><span><i style="background:var(--series-soft)"></i>Made money</span><span><i style="background:var(--bad-soft)"></i>Lost money</span><span>Select a day to add an event, or an event to edit it.</span></div></div>
-  <div class="card"><h3>All events</h3>${sorted.length ? `<div class="tablewrap"><table><thead><tr><th>Date</th><th>Event</th><th>DJ</th><th class="r">Gross</th><th class="r">DJ + other</th><th class="r">Net</th><th class="r">Vs a normal night</th><th></th></tr></thead><tbody>
-    ${sorted.map(e => { const x = ml(e), up = e.date>=TODAY, tag = x.kind==="projected"?"expected":x.kind==="entered"?"entered":"";
-      return `<tr class="clickable" data-edit-ev="${esc(e.id)}"><td>${fmtDay(e.date)}</td><td>${esc(e.name)}${e.sample?` <span class="pill">Sample</span>`:""}</td><td>${esc(e.dj||"")}</td>
-      <td class="r num">${x.gross==null?`<span class="muted">No sales yet</span>`:money(x.gross)+(tag?` <span class="muted small">${tag}</span>`:"")}</td><td class="r num">${money(x.cost)}</td>
+  <div class="card"><div class="spread"><h3>${cap(MON[m.getMonth()])} ${m.getFullYear()}</h3>
+    <div class="row"><button class="btn sm" data-act="month-prev" aria-label="${t("Previous month")}">${t("Previous")}</button><button class="btn sm" data-act="month-today">${t("This month")}</button><button class="btn sm" data-act="month-next" aria-label="${t("Next month")}">${t("Next")}</button></div></div>
+    <div class="tablewrap"><div class="cal">${DOW.map(d=>`<span class="dow">${cap(d)}</span>`).join("")}${cells}</div></div>
+    <div class="legend"><span><i style="background:var(--accent-soft)"></i>${t("Coming up")}</span><span><i style="background:var(--series-soft)"></i>${t("Made money")}</span><span><i style="background:var(--bad-soft)"></i>${t("Lost money")}</span><span>${t("Tap a day to add an event, or tap an event to change it.")}</span></div></div>
+  <div class="card"><h3>${t("All events")}</h3>${sorted.length ? `<div class="tablewrap"><table><thead><tr><th>${t("Date")}</th><th>${t("Event")}</th><th>${t("DJ")}</th><th class="r">${t("Sales")}</th><th class="r">${t("DJ and other costs")}</th><th class="r">${t("Profit")}</th><th class="r">${t("Worth it?")}</th><th></th></tr></thead><tbody>
+    ${sorted.map(e => { const x = ml(e), up = e.date>=TODAY, tag = x.kind==="projected"?t("expected"):x.kind==="entered"?t("entered"):"";
+      return `<tr class="clickable" data-edit-ev="${esc(e.id)}"><td>${fmtDay(e.date)}</td><td>${esc(e.name)}${e.sample?` <span class="pill">${t("Sample")}</span>`:""}</td><td>${esc(e.dj||"")}</td>
+      <td class="r num">${x.gross==null?`<span class="muted">${t("No sales yet")}</span>`:money(x.gross)+(tag?` <span class="muted small">${tag}</span>`:"")}</td><td class="r num">${money(x.cost)}</td>
       <td class="r num ${x.net==null?"":x.net>=0?"pos":"neg"}">${x.net==null?"":money(x.net)}</td>
       <td class="r num">${x.paid==null?"":`<span class="${x.paid>=0?"pos":"neg"}">${moneyS(x.paid)}</span>`}</td>
-      <td>${up?`<span class="pill warn">Scheduled</span>`:x.net==null?"":x.net>=0?`<span class="pill good">Profit</span>`:`<span class="pill bad">Loss</span>`}</td></tr>`; }).join("")}
-    </tbody></table></div><p class="muted small" style="margin-top:10px">"Vs a normal night" is the extra sales over a typical night of that weekday, after cost of goods, minus the DJ and event costs. Green means the event paid for itself.</p>`
-    : `<div class="empty">No events yet. Add your first DJ night to see what it costs and what it brings in.</div>`}</div>`;
+      <td>${up?`<span class="pill warn">${t("Scheduled")}</span>`:x.net==null?"":x.net>=0?`<span class="pill good">${t("Profit")}</span>`:`<span class="pill bad">${t("Loss")}</span>`}</td></tr>`; }).join("")}
+    </tbody></table></div><p class="muted small" style="margin-top:10px">${t("Worth it? compares the night with a normal night on the same day of the week: the extra sales (after the cost of drinks) minus the DJ and event costs. Green means the event paid for itself.")}</p>`
+    : `<div class="empty">${t("No events yet. Add your first DJ night to see what it costs and what it brings in.")}</div>`}</div>`;
 }
 function openEvent(id, date){
   const e = id ? S.events.find(x=>x.id===id) : null, v = e || {date:date||TODAY, name:"", dj:"", djFee:"", otherCost:"", gross:"", notes:""};
   const ov = $("#overlay");
   ov.innerHTML = `<div class="scrim" data-close="1"><form class="modal" id="evform" role="dialog" aria-modal="true" aria-labelledby="evt">
-    <div class="spread"><h3 id="evt">${e?"Edit event":"New event"}</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
+    <div class="spread"><h3 id="evt">${e?t("Edit event"):t("New event")}</h3><button type="button" class="btn sm" data-close="1">${t("Close")}</button></div>
     <div class="fgrid">
-      <div class="field"><label for="f-date">Date</label><input id="f-date" type="date" required value="${esc(v.date)}"></div>
-      <div class="field"><label for="f-name">Event</label><input id="f-name" required placeholder="Latin Night" value="${esc(v.name)}"></div>
-      <div class="field"><label for="f-dj">DJ</label><input id="f-dj" placeholder="DJ name" value="${esc(v.dj||"")}"></div>
-      <div class="field"><label for="f-fee">DJ fee ($)</label><input id="f-fee" type="number" min="0" step="1" value="${esc(v.djFee??"")}"></div>
-      <div class="field"><label for="f-other">Other event costs ($)</label><input id="f-other" type="number" min="0" step="1" value="${esc(v.otherCost??"")}"></div>
-      <div class="field"><label for="f-gross">Gross sales ($), optional</label><input id="f-gross" type="number" min="0" step="1" value="${esc(v.gross??"")}"></div>
-      <div class="field full"><label for="f-notes">Notes</label><textarea id="f-notes" rows="2" placeholder="Promo, security, special pricing">${esc(v.notes||"")}</textarea></div>
+      <div class="field"><label for="f-date">${t("Date")}</label><input id="f-date" type="date" required value="${esc(v.date)}"></div>
+      <div class="field"><label for="f-name">${t("Event")}</label><input id="f-name" required placeholder="${t("Latin Night")}" value="${esc(v.name)}"></div>
+      <div class="field"><label for="f-dj">${t("DJ")}</label><input id="f-dj" placeholder="${t("DJ name")}" value="${esc(v.dj||"")}"></div>
+      <div class="field"><label for="f-fee">${t("DJ fee ($)")}</label><input id="f-fee" type="number" inputmode="decimal" min="0" step="1" value="${esc(v.djFee??"")}"></div>
+      <div class="field"><label for="f-other">${t("Other event costs ($)")}</label><input id="f-other" type="number" inputmode="decimal" min="0" step="1" value="${esc(v.otherCost??"")}"></div>
+      <div class="field"><label for="f-gross">${t("Sales for the night ($), optional")}</label><input id="f-gross" type="number" inputmode="decimal" min="0" step="1" value="${esc(v.gross??"")}"></div>
+      <div class="field full"><label for="f-notes">${t("Notes")}</label><textarea id="f-notes" rows="2" placeholder="${t("Promo, security, special pricing")}">${esc(v.notes||"")}</textarea></div>
     </div>
-    <p class="muted small">Leave gross sales empty to use your sales for that date. Other costs can include security, promo, decorations and extra staff.</p>
-    <div class="spread"><div>${e?`<button type="button" class="btn danger" data-act="del-event" data-id="${esc(e.id)}">Delete event</button>`:""}</div><button class="btn primary" type="submit">Save event</button></div>
+    <p class="muted small">${t("Leave sales empty to use your Clover sales for that date. Other costs can include security, promotion, decorations and extra staff.")}</p>
+    <div class="spread"><div>${e?`<button type="button" class="btn danger" data-act="del-event" data-id="${esc(e.id)}">${t("Delete event")}</button>`:""}</div><button class="btn primary" type="submit">${t("Save event")}</button></div>
   </form></div>`;
   setTimeout(()=>{ const f = $("#f-name"); if(f) f.focus(); }, 30);
   $("#evform").addEventListener("submit", async ev => {
     ev.preventDefault();
     const o = {date:$("#f-date").value, name:$("#f-name").value.trim(), dj:$("#f-dj").value.trim(), djFee:+$("#f-fee").value||0, otherCost:+$("#f-other").value||0, notes:$("#f-notes").value.trim()};
     if($("#f-gross").value!=="") o.gross = +$("#f-gross").value;
-    if(!o.date || !o.name){ toast("Add a date and an event name."); return; }
+    if(!o.date || !o.name){ toast(t("Add a date and an event name.")); return; }
     const ok = await save("events/"+(e?e.id:newId("events")), o);
-    if(ok){ closeModal(); toast("Event saved"); }
+    if(ok){ closeModal(); toast(t("Event saved")); }
   });
 }
 
@@ -669,69 +1035,70 @@ function viewInventory(){
   const val = sum(S.inv.map(i => (+i.onHand||0)*(+i.cost||0))), low = S.inv.filter(i=>invStatus(i)!=="ok").length;
   const inc = S.inv.filter(i => (+i.incomingQty||0)>0), incVal = sum(inc.map(i => (+i.incomingQty||0)*(+i.cost||0)));
   const hasSamples = S.inv.some(i=>i.sample);
-  const st = i => { const s = invStatus(i); return s==="out"?`<span class="pill bad">Out</span>`:s==="low"?`<span class="pill warn">Low</span>`:`<span class="pill good">OK</span>`; };
+  const st = i => { const s = invStatus(i); return s==="out"?`<span class="pill bad">${t("Out")}</span>`:s==="low"?`<span class="pill warn">${t("Low")}</span>`:`<span class="pill good">${t("OK")}</span>`; };
   const level = i => { const pc = clamp((+i.onHand||0)/Math.max(1,+i.par||1)*100, 0, 100); return `<div class="bar ${invStatus(i)==="ok"?"":invStatus(i)}"><i style="width:${pc}%"></i></div>`; };
-  const stepper = i => `<span class="step"><button data-adj="${esc(i.id)}" data-d="-1" aria-label="One less ${esc(i.name)}">-</button><span>${+i.onHand||0}</span><button data-adj="${esc(i.id)}" data-d="1" aria-label="One more ${esc(i.name)}">+</button></span>`;
-  const dl = i => { const d = daysLeft(i); return d==null?`<span class="muted">n/a</span>`:`<span class="num ${d<4?"neg":d<8?"proj":""}">${d<1?"under 1":Math.round(d)} day${Math.round(d)===1?"":"s"}</span>`; };
-  const order = i => (+i.incomingQty||0)>0 ? `<span class="num">${+i.incomingQty}</span> <span class="muted small">${i.incomingDate?"on "+fmtDay(i.incomingDate):"date not set"}</span> <button class="link small" data-act="receive" data-id="${esc(i.id)}">Mark received</button>` : `<span class="muted">None</span>`;
-  const rows = list.map(i => `<tr><td><b>${esc(i.name)}</b>${i.sample?` <span class="pill">Sample</span>`:""}<div class="muted small">${esc(i.cat||"")}${i.unit?" &middot; "+esc(i.unit):""}</div></td>
+  const stepper = i => `<span class="step"><button data-adj="${esc(i.id)}" data-d="-1" aria-label="${t("One less")} ${esc(i.name)}">-</button><span>${+i.onHand||0}</span><button data-adj="${esc(i.id)}" data-d="1" aria-label="${t("One more")} ${esc(i.name)}">+</button></span>`;
+  const dl = i => { const d = daysLeft(i); return d==null?`<span class="muted">${t("n/a")}</span>`:`<span class="num ${d<4?"neg":d<8?"proj":""}">${d<1?t("under 1 day"):pl(Math.round(d),"{n} day","{n} days")}</span>`; };
+  const order = i => (+i.incomingQty||0)>0 ? `<span class="num">${+i.incomingQty}</span> <span class="muted small">${i.incomingDate?t("on")+" "+fmtDay(i.incomingDate):t("date not set")}</span> <button class="link small" data-act="receive" data-id="${esc(i.id)}">${t("Mark received")}</button>` : `<span class="muted">${t("None")}</span>`;
+  const rows = list.map(i => `<tr><td><b>${esc(i.name)}</b>${i.sample?` <span class="pill">${t("Sample")}</span>`:""}<div class="muted small">${esc(i.cat||"")}${i.unit?" &middot; "+esc(i.unit):""}</div></td>
     <td>${stepper(i)}</td><td><div class="row" style="flex-wrap:nowrap;gap:8px"><span class="num small muted">${+i.par||0}</span>${level(i)}</div></td><td class="r">${dl(i)}</td><td>${order(i)}</td><td class="r num">${money((+i.onHand||0)*(+i.cost||0))}</td><td>${st(i)}</td>
-    <td><button class="btn sm" data-act="edit-item" data-id="${esc(i.id)}">Edit</button></td></tr>`).join("");
+    <td><button class="btn sm" data-act="edit-item" data-id="${esc(i.id)}">${t("Edit")}</button></td></tr>`).join("");
   const cards = list.map(i => `<div class="card"><div class="spread"><b>${esc(i.name)}</b>${st(i)}</div><div class="muted small">${esc(i.cat||"")}${i.unit?" &middot; "+esc(i.unit):""}</div>
-    <div class="spread" style="margin-top:10px"><span>On hand ${stepper(i)}</span><span class="small">Par ${+i.par||0}</span></div><div style="margin-top:8px">${level(i)}</div>
-    <div class="small" style="margin-top:8px">Lasts ${dl(i)} &middot; On order: ${order(i)}</div><div style="margin-top:10px"><button class="btn sm" data-act="edit-item" data-id="${esc(i.id)}">Edit</button></div></div>`).join("");
+    <div class="spread" style="margin-top:10px"><span>${t("On hand")} ${stepper(i)}</span><span class="small">${t("Keep at least")} ${+i.par||0}</span></div><div style="margin-top:8px">${level(i)}</div>
+    <div class="small" style="margin-top:8px">${t("Lasts about")} ${dl(i)} &middot; ${t("On order")}: ${order(i)}</div><div style="margin-top:10px"><button class="btn sm" data-act="edit-item" data-id="${esc(i.id)}">${t("Edit")}</button></div></div>`).join("");
   return `
-  <div class="head rise"><div><h2>Inventory</h2><p>What is on the shelf and what is on the way. Use the plus and minus buttons for quick counts, and mark an order received when it arrives.</p></div>
-    <div class="row">${hasSamples?`<button class="btn" data-act="clear-inv">Remove sample items</button>`:""}<button class="btn primary" data-act="add-item">Add item</button></div></div>
+  <div class="head rise"><div><h2>${t("Inventory")}</h2><p>${t("What is on the shelf and what is on the way. Use the plus and minus buttons for quick counts, and tap Mark received when an order arrives.")}</p></div>
+    <div class="row">${hasSamples?`<button class="btn" data-act="clear-inv">${t("Remove sample items")}</button>`:""}<button class="btn primary" data-act="add-item">${t("Add item")}</button></div></div>
   ${banner()}
+  ${help("inventory", ["Use + and - to update a count in seconds. It saves by itself.", "Keep at least is the smallest amount you want on hand. When the count drops below it, the item shows as Low.", "When an order is on the way, enter how many and when. Tap Mark received when it arrives and the stock count goes up.", "Items that need attention are collected in the Needs attention filter and on the Reports tab as a shopping list."])}
   <div class="grid g4">
-    <div class="card stat"><span class="k">Items tracked</span><span class="v num">${S.inv.length}</span><span class="s">${cats.length} categor${cats.length===1?"y":"ies"}</span></div>
-    <div class="card stat"><span class="k">Stock on hand, at cost</span><span class="v num">${money(val)}</span><span class="s">On hand times cost per unit</span></div>
-    <div class="card stat"><span class="k">Below par</span><span class="v num ${low?"proj":""}">${low}</span><span class="s">${S.inv.filter(i=>invStatus(i)==="out").length} completely out</span></div>
-    <div class="card stat"><span class="k">On order</span><span class="v num">${inc.length}</span><span class="s">${money(incVal)} arriving</span></div>
+    <div class="card stat"><span class="k">${t("Items tracked")}</span><span class="v num">${S.inv.length}</span><span class="s">${pl(cats.length,"{n} category","{n} categories")}</span></div>
+    <div class="card stat"><span class="k">${t("Value of stock on hand")}</span><span class="v num">${money(val)}</span><span class="s">${t("What you paid for what is on the shelf")}</span></div>
+    <div class="card stat"><span class="k">${t("Below the minimum")}</span><span class="v num ${low?"proj":""}">${low}</span><span class="s">${t("{n} completely out",{n:S.inv.filter(i=>invStatus(i)==="out").length})}</span></div>
+    <div class="card stat"><span class="k">${t("On order")}</span><span class="v num">${inc.length}</span><span class="s">${t("{amt} arriving",{amt:money(incVal)})}</span></div>
   </div>
-  <div class="seg" role="group" aria-label="Filter" style="align-self:flex-start">${[["all","All"],["low","Needs attention"],...cats.map(c=>[c,c])].map(([k,l])=>`<button aria-pressed="${S.invFilter===k}" data-filter="${esc(k)}">${esc(l)}</button>`).join("")}</div>
-  ${list.length ? `<div class="card tbl-inv"><div class="tablewrap"><table><thead><tr><th>Item</th><th>On hand</th><th>Level vs par</th><th class="r">Lasts about</th><th>On order</th><th class="r">Value</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div><div class="cards">${cards}</div>`
-    : `<div class="empty">${S.inv.length?"No items match this filter.":"No inventory yet. Add the bottles, kegs and cases you stock, with a par level for each."}</div>`}
-  <p class="muted small">"Lasts about" uses the weekly usage you enter on each item. Once Clover sales are connected, usage can be worked out from sales.</p>`;
+  <div class="seg" role="group" aria-label="${t("Filter")}" style="align-self:flex-start">${[["all",t("All")],["low",t("Needs attention")],...cats.map(c=>[c,c])].map(([k,l])=>`<button aria-pressed="${S.invFilter===k}" data-filter="${esc(k)}">${esc(l)}</button>`).join("")}</div>
+  ${list.length ? `<div class="card tbl-inv"><div class="tablewrap"><table><thead><tr><th>${t("Item")}</th><th>${t("On hand")}</th><th>${t("Stock vs minimum")}</th><th class="r">${t("Lasts about")}</th><th>${t("On order")}</th><th class="r">${t("Value")}</th><th>${t("Status")}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div><div class="cards">${cards}</div>`
+    : `<div class="empty">${S.inv.length?t("No items match this filter."):t("No inventory yet. Add the bottles, kegs and cases you stock, with a minimum amount to keep for each.")}</div>`}
+  <p class="muted small">${t("Lasts about uses the weekly amount you enter for each item. Once Clover sales are connected, usage can be worked out from sales.")}</p>`;
 }
 function openItem(id){
   const i = id ? S.inv.find(x=>x.id===id) : null, v = i || {name:"", cat:"Beer", unit:"", onHand:0, par:0, cost:"", usage:"", incomingQty:"", incomingDate:""};
   const cats = [...new Set(["Beer","Liquor","Mixers","Supplies",...S.inv.map(x=>x.cat).filter(Boolean)])];
   $("#overlay").innerHTML = `<div class="scrim" data-close="1"><form class="modal" id="itform" role="dialog" aria-modal="true" aria-labelledby="itt">
-    <div class="spread"><h3 id="itt">${i?"Edit item":"New item"}</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
+    <div class="spread"><h3 id="itt">${i?t("Edit item"):t("New item")}</h3><button type="button" class="btn sm" data-close="1">${t("Close")}</button></div>
     <div class="fgrid">
-      <div class="field full"><label for="i-name">Item</label><input id="i-name" required placeholder="Corona Extra" value="${esc(v.name)}"></div>
-      <div class="field"><label for="i-cat">Category</label><input id="i-cat" list="i-cats" value="${esc(v.cat||"")}"><datalist id="i-cats">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
-      <div class="field"><label for="i-unit">Counted as</label><input id="i-unit" placeholder="case of 24, 750 ml bottle, half keg" value="${esc(v.unit||"")}"></div>
-      <div class="field"><label for="i-on">On hand</label><input id="i-on" type="number" min="0" step="1" value="${esc(v.onHand??0)}"></div>
-      <div class="field"><label for="i-par">Par level (keep at least)</label><input id="i-par" type="number" min="0" step="1" value="${esc(v.par??0)}"></div>
-      <div class="field"><label for="i-cost">Cost per unit ($)</label><input id="i-cost" type="number" min="0" step="0.01" value="${esc(v.cost??"")}"></div>
-      <div class="field"><label for="i-use">Used per week</label><input id="i-use" type="number" min="0" step="0.5" value="${esc(v.usage??"")}"></div>
-      <div class="field"><label for="i-inc">On order (units)</label><input id="i-inc" type="number" min="0" step="1" value="${esc(v.incomingQty??"")}"></div>
-      <div class="field"><label for="i-incd">Arrives on</label><input id="i-incd" type="date" value="${esc(v.incomingDate||"")}"></div>
+      <div class="field full"><label for="i-name">${t("Item")}</label><input id="i-name" required placeholder="Corona Extra" value="${esc(v.name)}"></div>
+      <div class="field"><label for="i-cat">${t("Category")}</label><input id="i-cat" list="i-cats" value="${esc(v.cat||"")}"><datalist id="i-cats">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
+      <div class="field"><label for="i-unit">${t("Counted as")}</label><input id="i-unit" placeholder="${t("case of 24, 750 ml bottle, half keg")}" value="${esc(v.unit||"")}"></div>
+      <div class="field"><label for="i-on">${t("On hand")}</label><input id="i-on" type="number" inputmode="decimal" min="0" step="1" value="${esc(v.onHand??0)}"></div>
+      <div class="field"><label for="i-par">${t("Keep at least (minimum)")}</label><input id="i-par" type="number" inputmode="decimal" min="0" step="1" value="${esc(v.par??0)}"></div>
+      <div class="field"><label for="i-cost">${t("Cost per unit ($)")}</label><input id="i-cost" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(v.cost??"")}"></div>
+      <div class="field"><label for="i-use">${t("Used per week")}</label><input id="i-use" type="number" inputmode="decimal" min="0" step="0.5" value="${esc(v.usage??"")}"></div>
+      <div class="field"><label for="i-inc">${t("On order (units)")}</label><input id="i-inc" type="number" inputmode="decimal" min="0" step="1" value="${esc(v.incomingQty??"")}"></div>
+      <div class="field"><label for="i-incd">${t("Arrives on")}</label><input id="i-incd" type="date" value="${esc(v.incomingDate||"")}"></div>
     </div>
-    <div class="spread"><div>${i?`<button type="button" class="btn danger" data-act="del-item" data-id="${esc(i.id)}">Delete item</button>`:""}</div><button class="btn primary" type="submit">Save item</button></div>
+    <div class="spread"><div>${i?`<button type="button" class="btn danger" data-act="del-item" data-id="${esc(i.id)}">${t("Delete item")}</button>`:""}</div><button class="btn primary" type="submit">${t("Save item")}</button></div>
   </form></div>`;
   setTimeout(()=>{ const f = $("#i-name"); if(f) f.focus(); }, 30);
   $("#itform").addEventListener("submit", async ev => {
     ev.preventDefault();
     const o = {name:$("#i-name").value.trim(), cat:$("#i-cat").value.trim()||"Other", unit:$("#i-unit").value.trim(), onHand:+$("#i-on").value||0, par:+$("#i-par").value||0, cost:+$("#i-cost").value||0, usage:+$("#i-use").value||0, incomingQty:+$("#i-inc").value||0, incomingDate:$("#i-incd").value};
-    if(!o.name){ toast("Give the item a name."); return; }
+    if(!o.name){ toast(t("Give the item a name.")); return; }
     const ok = await save("inventory/"+(i?i.id:newId("inventory")), o);
-    if(ok){ closeModal(); toast("Item saved"); }
+    if(ok){ closeModal(); toast(t("Item saved")); }
   });
 }
 function openConnect(){
   $("#overlay").innerHTML = `<div class="scrim" data-close="1"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="ct">
-    <div class="spread"><h3 id="ct">Connect Clover</h3><button type="button" class="btn sm" data-close="1">Close</button></div>
-    <p>Browsers block a page like this from calling Clover directly, and your API token must never sit in a web page. So live sales come through a small server that holds the token and passes your sales to this page.</p>
+    <div class="spread"><h3 id="ct">${t("Connect Clover")}</h3><button type="button" class="btn sm" data-close="1">${t("Close")}</button></div>
+    <p>${t("Browsers do not let a page like this call Clover directly, and your access token must never sit in a web page. So live sales come through a small server that holds the token and passes your sales to this page.")}</p>
     <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
-      <li>Create a read-only API token in Clover with access to Orders, Payments and Inventory.</li>
-      <li>Add CLOVER_API_TOKEN, CLOVER_MERCHANT_ID and APP_PASSWORD to the server's environment settings, or to a local .env file.</li>
-      <li>Restart or redeploy the server. This page then loads your real sales on its own.</li>
+      <li>${t("Create a read-only API token in Clover with access to Orders, Payments and Inventory.")}</li>
+      <li>${t("Add CLOVER_API_TOKEN, CLOVER_MERCHANT_ID and APP_PASSWORD to the server's environment settings, or to a local .env file.")}</li>
+      <li>${t("Restart or redeploy the server. This page then loads your real sales on its own.")}</li>
     </ol>
-    <p class="muted small">Never paste your token into this page or into chat.</p></div></div>`;
+    <p class="muted small">${t("Never paste your token into this page or into a chat.")}</p></div></div>`;
 }
 function closeModal(){ $("#overlay").innerHTML = ""; }
 
@@ -742,16 +1109,30 @@ function focusSig(){
   const at = a.getAttributeNames().filter(n => n.startsWith("data-") || n==="id").map(n => `[${n}="${CSS.escape(a.getAttribute(n))}"]`);
   return at.length ? a.tagName.toLowerCase()+at.join("") : null;
 }
+function setLang(l){
+  if(l !== "en" && l !== "es") return;
+  LANG = l; setNames();
+  try { localStorage.setItem("korona:lang", l); } catch(e){}
+  render();
+}
+function renderRail(){
+  $("#brandsub").textContent = t("Sales, nights and stock");
+  $("#langseg").innerHTML = `<button aria-pressed="${LANG==="en"}" data-lang="en" lang="en">English</button><button aria-pressed="${LANG==="es"}" data-lang="es" lang="es">Español</button>`;
+  $("#signout").textContent = t("Sign out");
+  $("#railnote").textContent = t("Events, costs and inventory you enter are saved on this device.");
+}
 function render(){
   const sig = focusSig();
+  renderRail();
+  $("#tabs").setAttribute("aria-label", t("Sections"));
   $("#tabs").innerHTML = TABS.map(([k,l]) => {
     let b = ""; if(k==="inventory"){ const n = S.inv.filter(i=>invStatus(i)!=="ok").length; if(n) b = `<span class="badge">${n}</span>`; }
     if(k==="events"){ const n = S.events.filter(e=>e.date>=TODAY && e.date<=key(addDays(today,7))).length; if(n) b = `<span class="badge">${n}</span>`; }
-    return `<button class="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}${b}</button>`;
+    return `<button class="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${t(l)}${b}</button>`;
   }).join("");
-  if(SALES.state === "loading"){ $("#main").innerHTML = `<div class="empty">Loading your Clover sales. The first load after the server starts can take a minute.</div>`; return; }
+  if(SALES.state === "loading"){ $("#main").innerHTML = `<div class="empty">${t("Loading your Clover sales. The first load after the server wakes up can take a minute or two.")}</div>`; return; }
   try { $("#main").innerHTML = VIEWS[S.tab](); }
-  catch(e){ $("#main").innerHTML = `<div class="empty">This section could not be drawn. Reload the page and try again.</div>`; console.error(e); }
+  catch(e){ $("#main").innerHTML = `<div class="empty">${t("This section could not be drawn. Reload the page and try again.")}</div>`; console.error(e); }
   if(sig){ try { const el = $(sig); if(el && !$("#overlay").firstChild) el.focus({preventScroll:true}); } catch(e){} }
 }
 const pending = {};
@@ -764,25 +1145,26 @@ function queueInv(id){
 }
 async function clearSamples(col, list){
   for(const x of list.filter(x=>x.sample)) await remove(col+"/"+x.id);
-  toast("Sample rows removed");
+  toast(t("Sample rows removed"));
 }
 document.addEventListener("click", async ev => {
-  const t = ev.target;
-  if(t.closest("[data-close]") && (t.matches(".scrim") || t.closest("button[data-close]"))){ closeModal(); return; }
+  const t0 = ev.target;
+  if(t0.closest("[data-close]") && (t0.matches(".scrim") || t0.closest("button[data-close]"))){ closeModal(); return; }
   let el;
-  if((el = t.closest("[data-tab],[data-go]"))){ S.tab = el.dataset.tab || el.dataset.go; render(); window.scrollTo(0,0); return; }
-  if((el = t.closest("[data-report]"))){ S.report = el.dataset.report; render(); return; }
-  if((el = t.closest("[data-week]"))){ S.weekBack = +el.dataset.week; render(); return; }
-  if((el = t.closest("[data-tday]"))){ S.trendDay = el.dataset.tday; render(); return; }
-  if((el = t.closest("[data-filter]"))){ S.invFilter = el.dataset.filter; render(); return; }
-  if((el = t.closest("[data-adj]"))){
+  if((el = t0.closest("[data-lang]"))){ setLang(el.dataset.lang); return; }
+  if((el = t0.closest("[data-tab],[data-go]"))){ S.tab = el.dataset.tab || el.dataset.go; render(); window.scrollTo(0,0); return; }
+  if((el = t0.closest("[data-report]"))){ S.report = el.dataset.report; render(); return; }
+  if((el = t0.closest("[data-week]"))){ S.weekBack = +el.dataset.week; render(); return; }
+  if((el = t0.closest("[data-tday]"))){ S.trendDay = el.dataset.tday; render(); return; }
+  if((el = t0.closest("[data-filter]"))){ S.invFilter = el.dataset.filter; render(); return; }
+  if((el = t0.closest("[data-adj]"))){
     const i = S.inv.find(x=>x.id===el.dataset.adj); if(!i) return;
     i.onHand = Math.max(0, (+i.onHand||0) + (+el.dataset.d)); render(); queueInv(i.id); return;
   }
-  if((el = t.closest("[data-ev]"))){ openEvent(el.dataset.ev); return; }
-  if((el = t.closest("[data-edit-ev]"))){ openEvent(el.dataset.editEv); return; }
-  if((el = t.closest("[data-cal]"))){ openEvent(null, el.dataset.cal); return; }
-  if((el = t.closest("[data-act]"))){
+  if((el = t0.closest("[data-ev]"))){ openEvent(el.dataset.ev); return; }
+  if((el = t0.closest("[data-edit-ev]"))){ openEvent(el.dataset.editEv); return; }
+  if((el = t0.closest("[data-cal]"))){ openEvent(null, el.dataset.cal); return; }
+  if((el = t0.closest("[data-act]"))){
     const a = el.dataset.act, id = el.dataset.id;
     if(a==="connect") openConnect();
     else if(a==="add-event") openEvent(null, TODAY);
@@ -794,19 +1176,27 @@ document.addEventListener("click", async ev => {
     else if(a==="receive"){
       const i = S.inv.find(x=>x.id===id); if(!i) return;
       const {id:_, ...rest} = i; rest.onHand = (+rest.onHand||0) + (+rest.incomingQty||0); rest.incomingQty = 0; rest.incomingDate = "";
-      if(await save("inventory/"+id, rest)) toast("Delivery added to stock");
+      if(await save("inventory/"+id, rest)) toast(t("Delivery added to stock"));
     }
-    else if(a==="del-event"){ if(await remove("events/"+id)){ closeModal(); toast("Event deleted"); } }
-    else if(a==="del-item"){ if(await remove("inventory/"+id)){ closeModal(); toast("Item deleted"); } }
+    else if(a==="del-event"){ if(await remove("events/"+id)){ closeModal(); toast(t("Event deleted")); } }
+    else if(a==="del-item"){ if(await remove("inventory/"+id)){ closeModal(); toast(t("Item deleted")); } }
     else if(a==="clear-events") clearSamples("events", S.events);
     else if(a==="clear-inv") clearSamples("inventory", S.inv);
     else if(a==="csv"){
-      const r = buildReport(), dl = await (window.claude && window.claude.use ? window.claude.use("downloads").catch(()=>null) : null);
-      if(!dl){ toast("Downloads are not available in this view."); return; }
-      try { await dl.save({filename:r.name+".csv", data:toCSV(r.cols, r.rows)}); toast("Report saved"); } catch(e){ if(e && e.code!=="declined") toast("Could not save the file."); }
+      const r = buildReport(), csv = toCSV(r.cols, r.rows), dl = await (window.claude && window.claude.use ? window.claude.use("downloads").catch(()=>null) : null);
+      if(dl){
+        try { await dl.save({filename:r.name+".csv", data:csv}); toast(t("Report saved")); } catch(e){ if(e && e.code!=="declined") toast(t("Could not save the file.")); }
+        return;
+      }
+      try { /* standalone version: save through the browser */
+        const url = URL.createObjectURL(new Blob(["﻿"+csv], {type:"text/csv;charset=utf-8"})), a2 = document.createElement("a");
+        a2.href = url; a2.download = r.name+".csv"; document.body.appendChild(a2); a2.click(); a2.remove(); setTimeout(()=>URL.revokeObjectURL(url), 2000);
+        toast(t("Report saved"));
+      } catch(e){ toast(t("Could not save the file.")); }
     }
   }
 });
+document.addEventListener("toggle", ev => { const d = ev.target; if(d && d.matches && d.matches("details[data-help]")) S.help[d.dataset.help] = d.open; }, true);
 document.addEventListener("keydown", ev => {
   if(ev.key==="Escape" && $("#overlay").firstChild) closeModal();
   if((ev.key==="Enter"||ev.key===" ") && ev.target.matches && ev.target.matches(".day[data-cal]")){ ev.preventDefault(); openEvent(null, ev.target.dataset.cal); }
@@ -817,6 +1207,7 @@ document.addEventListener("change", async ev => {
   S.settings = {...S.settings, [k]: k==="fixedWeek" ? v : Math.min(100, v)};
   render(); await save("settings/main", S.settings);
 });
+setNames();
 render();
 initStore();
 SALES.load();

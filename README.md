@@ -26,6 +26,10 @@ Pushing to `main` redeploys. On the free plan the service sleeps after 15 minute
 - **iPhone:** open the link in Safari, tap Share, then Add to Home Screen.
 - **Android:** open the link in Chrome, then use the menu and choose Install app or Add to Home screen.
 
+## Languages
+
+The app is in English and Spanish. The English / Español switch is at the top of the left menu (and at the top of the page on a phone), and on the sign-in screen. The choice is remembered on each device, and a phone set to Spanish opens in Spanish the first time. To change or add wording, edit the `ES` list in `public/index.html`: each line pairs the English text with its Spanish version.
+
 ## How the numbers work
 
 - Sales come from Clover orders. Orders that are open, refunded or credited are left out. A "business day" runs from 6am to 6am in `TIMEZONE`, so sales after midnight count toward the night before.
