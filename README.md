@@ -32,9 +32,10 @@ The app is in English and Spanish. The English / Español switch is at the top o
 
 ## How the numbers work
 
-- Sales come from Clover orders. Orders that are open, refunded or credited are left out. A "business day" runs from 6am to 6am in `TIMEZONE`, so sales after midnight count toward the night before.
-- Check yesterday's total here against Clover's own sales report the first time. If gross is off (for example, tax or tips handled differently), tell whoever maintains this so `server.js` can be adjusted.
-- Cost of goods, labor and fixed costs are percentages you set on the Reports tab. They are estimates until they match your books.
+- Daily totals come from Clover **payments** (completed payments only, refunds subtracted), the same basis as Clover's Transactions screen. If the token cannot read payments, the app falls back to orders and shows a banner saying totals are estimated. Drinks and items always come from orders. A "business day" runs from 6am to 6am in `TIMEZONE`, so sales after midnight count toward the night before.
+- To check accuracy, open `/api/diagnose` (while signed in). The `lastSevenDays` rows show what the app shows for each business day, the payments total, refunds, tips and the order total. Compare a row with Clover > Transactions > Payments for the same time window.
+- **Costs tab:** enter what you actually paid. Staff pay is entered per day. Rent, utilities, insurance and other costs can be one-time, weekly or monthly (with an optional stop date). For any day with no staff pay entered, the app estimates staff pay as a percentage of sales. Do not enter drink or liquor purchases; they are covered by the cost-of-goods percentage.
+- Cost of goods, estimated staff pay and weekly fixed costs are percentages and amounts you set at the bottom of the Costs tab. They are only used for days with nothing entered.
 - Events, costs and inventory are saved in the browser on the device you use. They do not sync between phone and computer yet.
 
 ## Files

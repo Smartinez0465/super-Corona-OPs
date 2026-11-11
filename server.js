@@ -47,17 +47,17 @@ async function cloverGet(pathAndQuery) {
   }
   throw new Error("Clover is rate limiting requests");
 }
-async function fetchOrders(fromMs, toMs) {
+async function fetchList(resource, fromMs, toMs, expand) {
   const out = [];
   let offset = 0;
   for (let page = 0; page < 400; page++) {
     const q = new URLSearchParams();
     q.append("filter", "createdTime>=" + fromMs);
     q.append("filter", "createdTime<=" + toMs);
-    q.append("expand", "lineItems");
+    if (expand) q.append("expand", expand);
     q.append("limit", "1000");
     q.append("offset", String(offset));
-    const data = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/orders?" + q.toString());
+    const data = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/" + resource + "?" + q.toString());
     const els = (data && data.elements) || [];
     if (!els.length) break;
     out.push(...els);
@@ -66,19 +66,21 @@ async function fetchOrders(fromMs, toMs) {
   }
   return out;
 }
+const fetchOrders = (f, t) => fetchList("orders", f, t, "lineItems");
 const COUNTED = new Set(["PAID", "PARTIALLY_PAID", "PARTIALLY_REFUNDED"]);
 /* Clover can leave paymentState as OPEN on orders that were paid by card (they become "locked"), so a locked order counts too.
    Refunded, voided and still-open tabs do not. */
 const tally = {};
 const isPaid = o => COUNTED.has(o.paymentState) || (o.paymentState === "OPEN" && o.state === "locked") || !o.paymentState;
-function emptyDay(date) { return { date, gross: 0, tx: 0, hourly: Array(24).fill(0), items: {} }; }
+/* Each day keeps two sets of money numbers: from orders (og/otx/oh) and from payments (pg/ptx/ph). gross/tx/hourly are filled in at the end from payments when they are available. */
+function emptyDay(date) { return { date, gross: 0, tx: 0, hourly: Array(24).fill(0), items: {}, og: 0, otx: 0, oh: Array(24).fill(0), pg: 0, ptx: 0, ph: Array(24).fill(0), ptips: 0, refunds: 0 }; }
 function addOrder(days, prices, o) {
   tally[(o.paymentState || "none") + " / " + (o.state || "none")] = (tally[(o.paymentState || "none") + " / " + (o.state || "none")] || 0) + 1;
   if (!isPaid(o)) return;
   const ms = +o.createdTime; if (!ms) return;
   const date = bizDate(ms), d = days[date]; if (!d) return;
   const dollars = (+o.total || 0) / 100;
-  d.gross += dollars; d.tx += 1; d.hourly[clockHour(ms)] += dollars;
+  d.og += dollars; d.otx += 1; d.oh[clockHour(ms)] += dollars;
   const els = (o.lineItems && o.lineItems.elements) || [];
   for (const li of els) {
     if (!li.name) continue;
@@ -89,8 +91,28 @@ function addOrder(days, prices, o) {
   }
 }
 
+/* Payments are what Clover's Transactions page adds up (cash and card, tips kept separate). Only completed payments count. */
+const PAID_RESULTS = new Set(["SUCCESS", "AUTH_COMPLETED"]);
+function addPayment(days, p) {
+  if (p.result && !PAID_RESULTS.has(p.result)) return;
+  const ms = +p.createdTime; if (!ms) return;
+  const d = days[bizDate(ms)]; if (!d) return;
+  const dollars = (+p.amount || 0) / 100;
+  d.pg += dollars; d.ptx += 1; d.ph[clockHour(ms)] += dollars; d.ptips += (+p.tipAmount || 0) / 100;
+}
+function addRefund(days, r) {
+  const ms = +r.createdTime; if (!ms) return;
+  const d = days[bizDate(ms)]; if (!d) return;
+  const dollars = (+r.amount || 0) / 100;
+  d.pg -= dollars; d.ph[clockHour(ms)] -= dollars; d.refunds += dollars;
+}
+function finishDay(d, usePayments) {
+  if (usePayments) { d.gross = d.pg; d.tx = d.ptx; d.hourly = d.ph.slice(); }
+  else { d.gross = d.og; d.tx = d.otx; d.hourly = d.oh.slice(); }
+}
+
 /* ---------- cache: finished days are fetched once, the last two days are refreshed ---------- */
-const cache = { status: TOKEN && MID ? "loading" : "not_configured", message: "", days: new Map(), prices: {}, updated: 0, busy: false };
+const cache = { status: TOKEN && MID ? "loading" : "not_configured", message: "", days: new Map(), prices: {}, updated: 0, busy: false, source: "orders", paymentsNote: "", refundsNote: "" };
 function window84() {
   const last = addDaysKey(bizDate(Date.now()), -1);
   return Array.from({ length: DAYS }, (_, i) => addDaysKey(last, i - (DAYS - 1)));
@@ -110,10 +132,23 @@ async function load(fullBackfill) {
     const prices = {};
     const fromMs = startMs(want[0]) - 3600e3, toMs = startMs(addDaysKey(want[want.length - 1], 1)) + 3600e3;
     const span = CHUNK_DAYS * 86400e3;
+    let payOk = true, payNote = "", refNote = "";
     for (let s = fromMs; s < toMs; s += span) {
-      const orders = await fetchOrders(s, Math.min(toMs, s + span));
+      const upto = Math.min(toMs, s + span - 1);
+      const orders = await fetchOrders(s, upto);
       orders.forEach(o => addOrder(days, prices, o));
+      if (payOk) {
+        try { (await fetchList("payments", s, upto)).forEach(p => addPayment(days, p)); }
+        catch (e) { payOk = false; payNote = e.message; }
+      }
+      if (payOk) {
+        try { (await fetchList("refunds", s, upto)).forEach(r => addRefund(days, r)); }
+        catch (e) { refNote = e.message; }
+      }
     }
+    if (!payOk) want.forEach(k => { const d = days[k]; d.pg = d.ptx = d.refunds = d.ptips = 0; d.ph.fill(0); });
+    want.forEach(k => finishDay(days[k], payOk));
+    cache.source = payOk ? "payments" : "orders"; cache.paymentsNote = payNote; cache.refundsNote = refNote;
     want.forEach(k => cache.days.set(k, days[k]));
     if (fullBackfill) cache.prices = prices;
     else for (const [n, p] of Object.entries(prices)) if (!cache.prices[n]) cache.prices[n] = p;
@@ -131,7 +166,7 @@ function salesPayload() {
   if (cache.status === "ready" || (cache.status === "error" && cache.days.size)) {
     body.days = window84().map(k => { const d = cache.days.get(k) || emptyDay(k); return { date: k, gross: Math.round(d.gross * 100) / 100, tx: d.tx, hourly: d.hourly.map(v => Math.round(v * 100) / 100), items: Object.fromEntries(Object.entries(d.items).map(([n, q]) => [n, Math.round(q * 100) / 100])) }; });
     body.prices = Object.fromEntries(Object.entries(cache.prices).filter(([, p]) => p.qty > 0).map(([n, p]) => [n, Math.round(p.rev / p.qty * 100) / 100]));
-    body.updated = cache.updated;
+    body.updated = cache.updated; body.source = cache.source;
   }
   return body;
 }
@@ -209,14 +244,15 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify(salesPayload()));
   }
   if (p === "/api/diagnose") { // signed-in only: shows what Clover returns, with no customer details
-    const out = { status: cache.status, message: cache.message, timezone: TZ, now: Date.now(), daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length, orderTally: tally };
+    const r2 = n => Math.round(n * 100) / 100;
+    const keys = window84().slice(-7);
+    const fmtT = ms => new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(ms));
+    const out = { status: cache.status, message: cache.message, timezone: TZ, source: cache.source, paymentsNote: cache.paymentsNote, refundsNote: cache.refundsNote, daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length, orderTally: tally,
+      compareInClover: "Clover > Transactions > Payments. Use the exact window listed for a day, then compare Payments total with paymentsTotal below (tips are separate in Clover).",
+      lastSevenDays: keys.map(k => { const d = cache.days.get(k) || emptyDay(k); return { day: k, window: fmtT(startMs(k)) + " to " + fmtT(startMs(addDaysKey(k, 1))), appShows: r2(d.gross), paymentsTotal: r2(d.pg + d.refunds), paymentsCount: d.ptx, refunds: r2(d.refunds), tips: r2(d.ptips), ordersTotal: r2(d.og), ordersCount: d.otx }; }) };
     try {
-      const m = await cloverGet("/v3/merchants/" + encodeURIComponent(MID));
-      out.merchantName = m && m.name;
-    } catch (e) { out.merchantError = e.message; }
-    try {
-      const o = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/orders?orderBy=" + encodeURIComponent("createdTime DESC") + "&limit=5");
-      out.latestOrders = ((o && o.elements) || []).map(x => ({ createdTime: x.createdTime, createdAt: x.createdTime ? new Date(+x.createdTime).toISOString() : null, paymentState: x.paymentState, state: x.state, total: x.total }));
+      const o = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/orders?orderBy=" + encodeURIComponent("createdTime DESC") + "&limit=3");
+      out.latestOrders = ((o && o.elements) || []).map(x => ({ createdAt: x.createdTime ? new Date(+x.createdTime).toISOString() : null, paymentState: x.paymentState, state: x.state, total: x.total }));
     } catch (e) { out.ordersError = e.message; }
     res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
     return res.end(JSON.stringify(out, null, 2));
