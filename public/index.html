@@ -193,6 +193,8 @@ const ES = {};
 function t(s, v){ let o = (LANG === "es" && ES[s]) || s; if(v) o = o.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m); return o; }
 const pl = (n, one, many) => t(n === 1 ? one : many, {n});
 Object.assign(ES, {
+"{n} night":"{n} noche",
+"{n} nights":"{n} noches",
 "Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Profit here and on every other tab updates right away.":"Sus ventas de la semana, noche por noche. Escriba lo que pagó a los trabajadores y otros gastos de cada noche. La ganancia aquí y en las demás secciones se actualiza al instante.",
 "Earlier week":"Semana anterior",
 "This week":"Esta semana",
