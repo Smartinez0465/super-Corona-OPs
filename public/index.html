@@ -84,6 +84,9 @@ p{margin:0}
 .seg button{appearance:none;border:0;background:var(--surface);padding:10px 15px;min-height:44px;font-weight:600;font-size:16px;cursor:pointer;color:var(--ink2)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .tablewrap{overflow-x:auto}
+.mini{width:104px;min-height:42px;padding:8px 10px;text-align:right;background:var(--bg);border:1px solid var(--line);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums}
+.mini:focus{border-color:var(--accent);outline:none}
+.mini::placeholder{color:var(--muted);opacity:.8}
 table{border-collapse:collapse;width:100%;font-size:16px}
 th{font-weight:600;font-size:14.5px;color:var(--ink2);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -190,6 +193,25 @@ const ES = {};
 function t(s, v){ let o = (LANG === "es" && ES[s]) || s; if(v) o = o.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m); return o; }
 const pl = (n, one, many) => t(n === 1 ? one : many, {n});
 Object.assign(ES, {
+"Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Profit here and on every other tab updates right away.":"Sus ventas de la semana, noche por noche. Escriba lo que pagó a los trabajadores y otros gastos de cada noche. La ganancia aquí y en las demás secciones se actualiza al instante.",
+"Earlier week":"Semana anterior",
+"This week":"Esta semana",
+"Later week":"Semana siguiente",
+"Sales this week":"Ventas de esta semana",
+"Costs this week":"Gastos de esta semana",
+"Staff pay this week":"Pago al personal esta semana",
+"Profit this week":"Ganancia de esta semana",
+"Real where entered, estimated on the other nights":"Real donde lo anotó, estimado en las demás noches",
+"No sales loaded for this week.":"No hay ventas cargadas para esta semana.",
+"Day by day":"Día por día",
+"Staff pay {a} of {b} nights entered":"Pago al personal: {a} de {b} noches anotadas",
+"After drinks, staff, event and other costs":"Después del costo de bebidas, personal, eventos y otros gastos",
+"Drinks (estimate)":"Bebidas (estimado)",
+"Event costs":"Costos de eventos",
+"+{amt} from Costs tab":"+{amt} de la sección Costos",
+"+{amt} automatic":"+{amt} automático",
+"Gray numbers in an empty box are estimates. Type the real amount to replace them, or clear the box to go back to the estimate. Event costs come from the Events tab.":"Los números grises en una casilla vacía son estimados. Escriba la cantidad real para reemplazarlos, o borre la casilla para volver al estimado. Los costos de eventos vienen de la sección Eventos.",
+"Enter a number.":"Escriba un número.",
 "This browser would not save the change.":"Este navegador no guardó el cambio.",
 "Could not save. Check your access and try again.":"No se pudo guardar. Revise su acceso e intente de nuevo.",
 "Could not delete.":"No se pudo borrar.",
@@ -668,8 +690,8 @@ function eventMoney(ev, days, settings, fc){
 /* ============ saved data (events, inventory, cost assumptions) ============ */
 const LS = { get(k,d){ try{ const v = localStorage.getItem("korona:"+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem("korona:"+k, JSON.stringify(v)); return true; }catch(e){ return false; } } };
 const S = {local:false, tab:"overview", events:[], inv:[], costs:[], settings:{cogsPct:27,laborPct:22,fixedWeek:0}, loaded:false, db:null, slow:false,
-  month:new Date(today.getFullYear(), today.getMonth(), 1), report:"ledger", weekBack:0, trendDay:"all", invFilter:"all", help:{}};
-const TABS = [["overview","Overview"],["reports","Reports"],["forecast","Forecast"],["trends","Trends"],["events","Events"],["costs","Costs"],["inventory","Inventory"]]; /* labels go through t() when drawn */
+  month:new Date(today.getFullYear(), today.getMonth(), 1), report:"ledger", dWeekBack:0, weekBack:0, trendDay:"all", invFilter:"all", help:{}};
+const TABS = [["overview","Overview"],["reports","Reports"],["forecast","Forecast"],["trends","Trends"],["events","Events"],["daily","Day by day"],["costs","Costs"],["inventory","Inventory"]]; /* labels go through t() when drawn */
 let toastT;
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, 2600); }
 async function initStore(){
@@ -1063,6 +1085,44 @@ function openCost(id, preset){
   });
 }
 
+
+/* ============ day by day (a week at a time; type each day's real costs and everything else follows) ============ */
+const dsId = d => "ds-"+d, doId = d => "do-"+d;
+function viewDaily(){
+  const days = SALES.days(), ws = addDays(weekStart(today), -7*S.dWeekBack), from = key(ws), to = key(addDays(ws,6));
+  const list = days.filter(d => d.date>=from && d.date<=to).reverse();
+  const w = list.length ? weekNet(days, list[list.length-1].date, list[0].date) : null;
+  const costsOf = x => x.cogs + x.labor + x.evc + x.other;
+  const oldest = days.length ? days[0].date : from, canBack = from > oldest;
+  const rows = list.map(d => {
+    const c = costOn(d.date, d.gross), evs = S.events.filter(e=>e.date===d.date), ev = sum(evs.map(e=>(+e.djFee||0)+(+e.otherCost||0)));
+    const mineS = S.costs.find(x=>x.id===dsId(d.date)), mineO = S.costs.find(x=>x.id===doId(d.date));
+    const restS = sum(S.costs.filter(x=>x.cat==="Staff pay" && x.id!==dsId(d.date) && covers(x,d.date)).map(perDay));
+    const restO = c.other - (mineO ? +mineO.amount||0 : 0);
+    const net = d.gross - c.cogs - c.labor - c.other - ev;
+    return `<tr><td><b>${fmtDay(d.date)}</b>${evs.length?`<div class="muted small">${esc(evs.map(e=>e.name).join(", "))}</div>`:""}</td>
+      <td class="r num"><b>${money(d.gross)}</b></td><td class="r num muted">${money(c.cogs)}</td>
+      <td class="r"><input class="mini" id="dc-s-${d.date}" data-daycost="staff" data-date="${d.date}" type="number" inputmode="decimal" min="0" step="0.01" value="${mineS?esc(mineS.amount):""}" placeholder="${c.actualStaff?"0":"~"+Math.round(c.labor)}" aria-label="${t("Staff pay")} ${fmtDay(d.date)}">${restS>0?`<div class="muted small">${t("+{amt} from Costs tab",{amt:money(restS)})}</div>`:""}</td>
+      <td class="r"><input class="mini" id="dc-o-${d.date}" data-daycost="other" data-date="${d.date}" type="number" inputmode="decimal" min="0" step="0.01" value="${mineO?esc(mineO.amount):""}" placeholder="0" aria-label="${t("Other costs")} ${fmtDay(d.date)}">${restO>0.005?`<div class="muted small">${t("+{amt} automatic",{amt:money(restO)})}</div>`:""}</td>
+      <td class="r num">${ev?money(ev):`<span class="muted">-</span>`}</td>
+      <td class="r num ${net>=0?"pos":"neg"}"><b>${money(net)}</b></td></tr>`;
+  }).join("");
+  const label = shortDate(ws)+" - "+shortDate(addDays(ws,6));
+  return `
+  <div class="head rise"><div><h2>${t("Day by day")}</h2><p>${t("Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Profit here and on every other tab updates right away.")}</p></div>
+    <div class="row"><button class="btn sm" data-act="dweek-prev" ${canBack?"":"disabled"}>${t("Earlier week")}</button><button class="btn sm" data-act="dweek-today">${t("This week")}</button><button class="btn sm" data-act="dweek-next" ${S.dWeekBack>0?"":"disabled"}>${t("Later week")}</button></div></div>
+  ${banner()}
+  <div class="grid g4">
+    <div class="card stat"><span class="k">${t("Sales this week")}</span><span class="v num">${money(w?w.gross:0)}</span><span class="s">${label} &middot; ${pl(list.length,"{n} night","{n} nights")}</span></div>
+    <div class="card stat"><span class="k">${t("Costs this week")}</span><span class="v num">${money(w?costsOf(w):0)}</span><span class="s">${w?t("Staff pay {a} of {b} nights entered",{a:w.actual,b:w.nd}):""}</span></div>
+    <div class="card stat"><span class="k">${t("Staff pay this week")}</span><span class="v num">${money(w?w.labor:0)}</span><span class="s">${w&&w.actual===w.nd&&w.nd?t("Actual, from what you entered"):t("Real where entered, estimated on the other nights")}</span></div>
+    <div class="card stat"><span class="k">${t("Profit this week")}</span><span class="v num ${w&&w.net>=0?"pos":"neg"}">${money(w?w.net:0)}</span><span class="s">${t("After drinks, staff, event and other costs")}</span></div>
+  </div>
+  <div class="card"><h3>${label}</h3>${list.length?`<div class="tablewrap"><table><thead><tr><th>${t("Day")}</th><th class="r">${t("Sales")}</th><th class="r">${t("Drinks (estimate)")}</th><th class="r">${t("Staff pay")}</th><th class="r">${t("Other costs")}</th><th class="r">${t("Event costs")}</th><th class="r">${t("Profit")}</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="muted small" style="margin-top:10px">${t("Gray numbers in an empty box are estimates. Type the real amount to replace them, or clear the box to go back to the estimate. Event costs come from the Events tab.")}</p>`
+    : `<div class="empty">${t("No sales loaded for this week.")}</div>`}</div>`;
+}
+
 /* ============ inventory ============ */
 function daysLeft(i){ const u = +i.usage||0; return u>0 ? (+i.onHand||0)/(u/7) : null; }
 function viewInventory(){
@@ -1138,7 +1198,7 @@ function openConnect(){
 function closeModal(){ $("#overlay").innerHTML = ""; }
 
 /* ============ render + events ============ */
-const VIEWS = {overview:viewOverview, reports:viewReports, forecast:viewForecast, trends:viewTrends, events:viewEvents, costs:viewCosts, inventory:viewInventory};
+const VIEWS = {overview:viewOverview, reports:viewReports, forecast:viewForecast, trends:viewTrends, events:viewEvents, costs:viewCosts, daily:viewDaily, inventory:viewInventory};
 function focusSig(){
   const a = document.activeElement; if(!a || a===document.body || !a.getAttributeNames) return null;
   const at = a.getAttributeNames().filter(n => n.startsWith("data-") || n==="id").map(n => `[${n}="${CSS.escape(a.getAttribute(n))}"]`);
@@ -1210,6 +1270,9 @@ document.addEventListener("click", async ev => {
     else if(a==="edit-item") openItem(id);
     else if(a==="month-prev") { S.month = new Date(S.month.getFullYear(), S.month.getMonth()-1, 1); render(); }
     else if(a==="month-next") { S.month = new Date(S.month.getFullYear(), S.month.getMonth()+1, 1); render(); }
+    else if(a==="dweek-prev") { S.dWeekBack++; render(); }
+    else if(a==="dweek-next") { S.dWeekBack = Math.max(0, S.dWeekBack-1); render(); }
+    else if(a==="dweek-today") { S.dWeekBack = 0; render(); }
     else if(a==="month-today") { S.month = new Date(today.getFullYear(), today.getMonth(), 1); render(); }
     else if(a==="receive"){
       const i = S.inv.find(x=>x.id===id); if(!i) return;
@@ -1240,6 +1303,24 @@ document.addEventListener("keydown", ev => {
   if((ev.key==="Enter"||ev.key===" ") && ev.target.matches && ev.target.matches(".day[data-cal]")){ ev.preventDefault(); openEvent(null, ev.target.dataset.cal); }
 });
 document.addEventListener("change", async ev => {
+  const dc = ev.target.closest && ev.target.closest("[data-daycost]");
+  if(dc){
+    const date = dc.dataset.date, staff = dc.dataset.daycost==="staff", id = (staff?dsId:doId)(date), raw = dc.value.trim(), amt = Math.round((+raw)*100)/100;
+    if(raw===""){
+      const i = S.costs.findIndex(x=>x.id===id); if(i<0) return;
+      if(S.db) await remove("costs/"+id); else { S.costs.splice(i,1); LS.set("costs", S.costs); setTimeout(render, 0); }
+      return;
+    }
+    if(!(amt>=0)){ toast(t("Enter a number.")); return; }
+    if(S.db) await save("costs/"+id, {date, cat:staff?"Staff pay":"Other", amount:amt, repeat:"once", end:"", note:"", daily:true});
+    else { /* quiet save: redraw after focus has moved on, so tabbing between boxes keeps working */
+      const row = {id, date, cat:staff?"Staff pay":"Other", amount:amt, repeat:"once", end:"", note:"", daily:true}, i = S.costs.findIndex(x=>x.id===id);
+      if(i>=0) S.costs[i] = row; else S.costs.push(row);
+      S.costs.sort((a,b)=>b.date.localeCompare(a.date)); if(!LS.set("costs", S.costs)) toast(t("This browser would not save the change."));
+      setTimeout(render, 0);
+    }
+    return;
+  }
   const el = ev.target.closest && ev.target.closest("[data-set]"); if(!el) return;
   const v = Math.max(0, +el.value || 0), k = el.dataset.set;
   S.settings = {...S.settings, [k]: k==="fixedWeek" ? v : Math.min(100, v)};
