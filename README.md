@@ -17,6 +17,7 @@ There is nothing to install: the server uses only what comes with Node.js 20 or 
 1. Create a Render account and choose New, then Web Service, and connect this GitHub repo.
 2. Runtime: Node. Start command: `npm start`. Instance type: Free is enough to start.
 3. In the service's Environment settings, add `CLOVER_API_TOKEN`, `CLOVER_MERCHANT_ID`, `APP_PASSWORD` and, if needed, `TIMEZONE`.
+   - **Second Clover account:** if the bar's sales are split across two Clover accounts, also add `CLOVER_API_TOKEN_2` and `CLOVER_MERCHANT_ID_2` (a third would be `_3`, and so on). Each token must be made inside its own account. The app adds every account's sales together. Don't add the same account twice, or its sales will be counted twice.
 4. Deploy. Render gives you a link. Open it, sign in with `APP_PASSWORD`, and wait for the first Clover load (about a minute).
 
 Pushing to `main` redeploys. On the free plan the service sleeps after 15 minutes without visitors, so the first open after a break is slow and the Clover load restarts.

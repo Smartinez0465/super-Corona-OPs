@@ -3,6 +3,7 @@
   Super Korona Ops server. No packages to install (Node 20+).
   Reads secrets from environment variables, never from the page:
     CLOVER_API_TOKEN, CLOVER_MERCHANT_ID, APP_PASSWORD
+  More Clover accounts (their sales are added together): CLOVER_API_TOKEN_2 and CLOVER_MERCHANT_ID_2, then _3, and so on.
   Optional: TIMEZONE (default America/New_York), PORT (default 3000), CLOVER_BASE_URL (default https://api.clover.com)
   Run locally:  node --env-file=.env server.js
 */
@@ -12,8 +13,13 @@ const path = require("path");
 const crypto = require("crypto");
 
 const PORT = +process.env.PORT || 3000;
-const TOKEN = process.env.CLOVER_API_TOKEN || "";
-const MID = process.env.CLOVER_MERCHANT_ID || "";
+/* Every Clover account whose sales count toward the bar. Account 1 uses the plain names, the rest add _2, _3 and so on. */
+const ACCOUNTS = [];
+for (let i = 1; i <= 9; i++) {
+  const sfx = i === 1 ? "" : "_" + i, token = (process.env["CLOVER_API_TOKEN" + sfx] || "").trim(), mid = (process.env["CLOVER_MERCHANT_ID" + sfx] || "").trim();
+  if (token && mid) ACCOUNTS.push({ n: i, label: "Account " + i, token, mid });
+}
+const CONFIGURED = ACCOUNTS.length > 0;
 const PASSWORD = process.env.APP_PASSWORD || "";
 const BASE = (process.env.CLOVER_BASE_URL || "https://api.clover.com").replace(/\/+$/, "");
 const TZ = process.env.TIMEZONE || "America/New_York";
@@ -37,17 +43,17 @@ const addDaysKey = (k, n) => { const [y, m, d] = k.split("-").map(Number); const
 
 /* ---------- Clover ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-async function cloverGet(pathAndQuery) {
+async function cloverGet(acct, pathAndQuery) {
   for (let attempt = 0; attempt < 5; attempt++) {
-    const res = await fetch(BASE + pathAndQuery, { headers: { Authorization: "Bearer " + TOKEN, Accept: "application/json" } });
+    const res = await fetch(BASE + pathAndQuery, { headers: { Authorization: "Bearer " + acct.token, Accept: "application/json" } });
     if (res.status === 429) { await sleep(1000 * (attempt + 1)); continue; }
-    if (res.status === 401 || res.status === 403) { const e = new Error("Clover rejected the token (" + res.status + ")"); e.code = "auth"; throw e; }
+    if (res.status === 401 || res.status === 403) { const e = new Error("Clover rejected the token for " + acct.label + " (" + res.status + ")"); e.code = "auth"; throw e; }
     if (!res.ok) throw new Error("Clover returned " + res.status);
     return res.json();
   }
   throw new Error("Clover is rate limiting requests");
 }
-async function fetchList(resource, fromMs, toMs, expand) {
+async function fetchList(acct, resource, fromMs, toMs, expand) {
   const out = [];
   let offset = 0;
   for (let page = 0; page < 400; page++) {
@@ -57,7 +63,7 @@ async function fetchList(resource, fromMs, toMs, expand) {
     if (expand) q.append("expand", expand);
     q.append("limit", "1000");
     q.append("offset", String(offset));
-    const data = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/" + resource + "?" + q.toString());
+    const data = await cloverGet(acct, "/v3/merchants/" + encodeURIComponent(acct.mid) + "/" + resource + "?" + q.toString());
     const els = (data && data.elements) || [];
     if (!els.length) break;
     out.push(...els);
@@ -66,7 +72,7 @@ async function fetchList(resource, fromMs, toMs, expand) {
   }
   return out;
 }
-const fetchOrders = (f, t) => fetchList("orders", f, t, "lineItems");
+const fetchOrders = (acct, f, t) => fetchList(acct, "orders", f, t, "lineItems");
 const COUNTED = new Set(["PAID", "PARTIALLY_PAID", "PARTIALLY_REFUNDED"]);
 /* Clover can leave paymentState as OPEN on orders that were paid by card (they become "locked"), so a locked order counts too.
    Refunded, voided and still-open tabs do not. */
@@ -112,7 +118,7 @@ function finishDay(d, usePayments) {
 }
 
 /* ---------- cache: finished days are fetched once, the last two days are refreshed ---------- */
-const cache = { status: TOKEN && MID ? "loading" : "not_configured", message: "", days: new Map(), prices: {}, updated: 0, busy: false, source: "orders", paymentsNote: "", refundsNote: "" };
+const cache = { status: CONFIGURED ? "loading" : "not_configured", byAccount: {}, accountErrors: [], message: "", days: new Map(), prices: {}, updated: 0, busy: false, source: "orders", paymentsNote: "", refundsNote: "" };
 function window84() {
   const last = addDaysKey(bizDate(Date.now()), -1);
   return Array.from({ length: DAYS }, (_, i) => addDaysKey(last, i - (DAYS - 1)));
@@ -123,37 +129,69 @@ function startMs(dateKey) { // earliest instant that belongs to this business da
   for (let i = 0; i <= 160; i++, t += 15 * 60e3) if (bizDate(t) === dateKey) return t;
   return Date.UTC(y, m - 1, d, 11);
 }
+/* Load one Clover account into its own set of days. Uses payments when the token can read them, otherwise orders. */
+async function loadAccount(acct, want, prices) {
+  const days = {}; want.forEach(k => { days[k] = emptyDay(k); });
+  const fromMs = startMs(want[0]) - 3600e3, toMs = startMs(addDaysKey(want[want.length - 1], 1)) + 3600e3;
+  const span = CHUNK_DAYS * 86400e3;
+  let payOk = true, payNote = "", refNote = "";
+  for (let s = fromMs; s < toMs; s += span) {
+    const upto = Math.min(toMs, s + span - 1);
+    (await fetchOrders(acct, s, upto)).forEach(o => addOrder(days, prices, o));
+    if (payOk) {
+      try { (await fetchList(acct, "payments", s, upto)).forEach(p => addPayment(days, p)); }
+      catch (e) { payOk = false; payNote = e.message; }
+    }
+    if (payOk) {
+      try { (await fetchList(acct, "refunds", s, upto)).forEach(r => addRefund(days, r)); }
+      catch (e) { refNote = e.message; }
+    }
+  }
+  if (!payOk) want.forEach(k => { const d = days[k]; d.pg = d.ptx = d.refunds = d.ptips = 0; d.ph.fill(0); });
+  want.forEach(k => finishDay(days[k], payOk));
+  return { days, payOk, payNote, refNote };
+}
+const NUM_FIELDS = ["gross", "tx", "og", "otx", "pg", "ptx", "ptips", "refunds"], ARR_FIELDS = ["hourly", "oh", "ph"];
+function addInto(t, d) {
+  NUM_FIELDS.forEach(f => { t[f] += d[f]; });
+  ARR_FIELDS.forEach(f => d[f].forEach((v, h) => { t[f][h] += v; }));
+  for (const [n, q] of Object.entries(d.items)) t.items[n] = (t.items[n] || 0) + q;
+}
 async function load(fullBackfill) {
-  if (!(TOKEN && MID) || cache.busy) return;
+  if (!CONFIGURED || cache.busy) return;
   cache.busy = true;
   try {
     const keys = window84(), want = fullBackfill ? keys : keys.slice(-2);
-    const days = {}; want.forEach(k => { days[k] = emptyDay(k); });
-    const prices = {};
-    const fromMs = startMs(want[0]) - 3600e3, toMs = startMs(addDaysKey(want[want.length - 1], 1)) + 3600e3;
-    const span = CHUNK_DAYS * 86400e3;
-    let payOk = true, payNote = "", refNote = "";
-    for (let s = fromMs; s < toMs; s += span) {
-      const upto = Math.min(toMs, s + span - 1);
-      const orders = await fetchOrders(s, upto);
-      orders.forEach(o => addOrder(days, prices, o));
-      if (payOk) {
-        try { (await fetchList("payments", s, upto)).forEach(p => addPayment(days, p)); }
-        catch (e) { payOk = false; payNote = e.message; }
-      }
-      if (payOk) {
-        try { (await fetchList("refunds", s, upto)).forEach(r => addRefund(days, r)); }
-        catch (e) { refNote = e.message; }
+    const prices = {}, errors = [], notes = [];
+    let anyOk = false, allPayments = true, authFail = 0;
+    for (const acct of ACCOUNTS) {
+      try {
+        const r = await loadAccount(acct, want, prices);
+        anyOk = true;
+        if (!r.payOk) { allPayments = false; notes.push(acct.label + ": " + r.payNote); }
+        if (r.refNote) notes.push(acct.label + " refunds: " + r.refNote);
+        const m = cache.byAccount[acct.label] || (cache.byAccount[acct.label] = new Map());
+        want.forEach(k => m.set(k, r.days[k]));
+        for (const k of [...m.keys()]) if (!keys.includes(k)) m.delete(k);
+      } catch (e) {
+        if (e.code === "auth") authFail++;
+        errors.push(acct.label + ": " + e.message);
+        console.error("Clover load failed for " + acct.label + ":", e.message);
       }
     }
-    if (!payOk) want.forEach(k => { const d = days[k]; d.pg = d.ptx = d.refunds = d.ptips = 0; d.ph.fill(0); });
-    want.forEach(k => finishDay(days[k], payOk));
-    cache.source = payOk ? "payments" : "orders"; cache.paymentsNote = payNote; cache.refundsNote = refNote;
-    want.forEach(k => cache.days.set(k, days[k]));
+    cache.accountErrors = errors;
+    if (!anyOk) { const e = new Error(errors.join("; ")); if (authFail === ACCOUNTS.length) e.code = "auth"; throw e; }
+    /* the bar's day = every account's day added together */
+    want.forEach(k => {
+      const tot = emptyDay(k);
+      for (const acct of ACCOUNTS) { const m = cache.byAccount[acct.label]; const d = m && m.get(k); if (d) addInto(tot, d); }
+      cache.days.set(k, tot);
+    });
+    cache.source = allPayments ? "payments" : "orders"; cache.paymentsNote = notes.join("; "); cache.refundsNote = "";
     if (fullBackfill) cache.prices = prices;
     else for (const [n, p] of Object.entries(prices)) if (!cache.prices[n]) cache.prices[n] = p;
     for (const k of [...cache.days.keys()]) if (!keys.includes(k)) cache.days.delete(k);
-    cache.status = "ready"; cache.message = ""; cache.updated = Date.now();
+    cache.status = "ready"; cache.message = errors.join("; "); cache.updated = Date.now();
   } catch (e) {
     cache.message = e.message;
     if (e.code === "auth") cache.status = "auth_error";
@@ -166,7 +204,7 @@ function salesPayload() {
   if (cache.status === "ready" || (cache.status === "error" && cache.days.size)) {
     body.days = window84().map(k => { const d = cache.days.get(k) || emptyDay(k); return { date: k, gross: Math.round(d.gross * 100) / 100, tx: d.tx, hourly: d.hourly.map(v => Math.round(v * 100) / 100), items: Object.fromEntries(Object.entries(d.items).map(([n, q]) => [n, Math.round(q * 100) / 100])) }; });
     body.prices = Object.fromEntries(Object.entries(cache.prices).filter(([, p]) => p.qty > 0).map(([n, p]) => [n, Math.round(p.rev / p.qty * 100) / 100]));
-    body.updated = cache.updated; body.source = cache.source;
+    body.updated = cache.updated; body.source = cache.source; body.accounts = ACCOUNTS.length; body.accountErrors = cache.accountErrors;
   }
   return body;
 }
@@ -247,13 +285,17 @@ const server = http.createServer(async (req, res) => {
     const r2 = n => Math.round(n * 100) / 100;
     const keys = window84().slice(-7);
     const fmtT = ms => new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(ms));
-    const out = { status: cache.status, message: cache.message, timezone: TZ, source: cache.source, paymentsNote: cache.paymentsNote, refundsNote: cache.refundsNote, daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length, orderTally: tally,
+    const out = { accounts: ACCOUNTS.map(a => ({ label: a.label, merchantId: a.mid, loaded: cache.byAccount[a.label] ? cache.byAccount[a.label].size + " days" : "not loaded" })), accountErrors: cache.accountErrors, status: cache.status, message: cache.message, timezone: TZ, source: cache.source, paymentsNote: cache.paymentsNote, refundsNote: cache.refundsNote, daysLoaded: cache.days.size, daysWithSales: [...cache.days.values()].filter(d => d.gross > 0).length, orderTally: tally,
       compareInClover: "Clover > Transactions > Payments. Use the exact window listed for a day, then compare Payments total with paymentsTotal below (tips are separate in Clover).",
-      lastSevenDays: keys.map(k => { const d = cache.days.get(k) || emptyDay(k); return { day: k, window: fmtT(startMs(k)) + " to " + fmtT(startMs(addDaysKey(k, 1))), appShows: r2(d.gross), paymentsTotal: r2(d.pg + d.refunds), paymentsCount: d.ptx, refunds: r2(d.refunds), tips: r2(d.ptips), ordersTotal: r2(d.og), ordersCount: d.otx }; }) };
-    try {
-      const o = await cloverGet("/v3/merchants/" + encodeURIComponent(MID) + "/orders?orderBy=" + encodeURIComponent("createdTime DESC") + "&limit=3");
-      out.latestOrders = ((o && o.elements) || []).map(x => ({ createdAt: x.createdTime ? new Date(+x.createdTime).toISOString() : null, paymentState: x.paymentState, state: x.state, total: x.total }));
-    } catch (e) { out.ordersError = e.message; }
+      lastSevenDays: keys.map(k => { const d = cache.days.get(k) || emptyDay(k); return { day: k, window: fmtT(startMs(k)) + " to " + fmtT(startMs(addDaysKey(k, 1))), appShows: r2(d.gross), paymentsTotal: r2(d.pg + d.refunds), paymentsCount: d.ptx, refunds: r2(d.refunds), tips: r2(d.ptips), ordersTotal: r2(d.og), ordersCount: d.otx,
+        byAccount: ACCOUNTS.length > 1 ? Object.fromEntries(ACCOUNTS.map(a => { const x = (cache.byAccount[a.label] && cache.byAccount[a.label].get(k)) || emptyDay(k); return [a.label, { appShows: r2(x.gross), paymentsTotal: r2(x.pg + x.refunds), refunds: r2(x.refunds), tips: r2(x.ptips) }]; })) : undefined }; }) };
+    out.latestOrders = {};
+    for (const a of ACCOUNTS) {
+      try {
+        const o = await cloverGet(a, "/v3/merchants/" + encodeURIComponent(a.mid) + "/orders?orderBy=" + encodeURIComponent("createdTime DESC") + "&limit=3");
+        out.latestOrders[a.label] = ((o && o.elements) || []).map(x => ({ createdAt: x.createdTime ? new Date(+x.createdTime).toISOString() : null, paymentState: x.paymentState, state: x.state, total: x.total }));
+      } catch (e) { out.latestOrders[a.label] = { error: e.message }; }
+    }
     res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
     return res.end(JSON.stringify(out, null, 2));
   }
@@ -262,6 +304,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log("Super Korona Ops is running on port " + PORT + (TOKEN && MID ? "" : " (Clover is not configured, so the dashboard shows sample sales)"));
-  if (TOKEN && MID) load(true);
+  console.log("Super Korona Ops is running on port " + PORT + (CONFIGURED ? " with " + ACCOUNTS.length + " Clover account" + (ACCOUNTS.length > 1 ? "s" : "") : " (Clover is not configured, so the dashboard shows sample sales)"));
+  if (CONFIGURED) load(true);
 });

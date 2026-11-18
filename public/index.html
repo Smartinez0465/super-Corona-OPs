@@ -193,6 +193,7 @@ const ES = {};
 function t(s, v){ let o = (LANG === "es" && ES[s]) || s; if(v) o = o.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m); return o; }
 const pl = (n, one, many) => t(n === 1 ? one : many, {n});
 Object.assign(ES, {
+"<b>One of your Clover accounts did not load, so its sales are missing from the totals.</b> Check its token and merchant ID in Render.":"<b>Una de sus cuentas de Clover no cargó, así que sus ventas faltan en los totales.</b> Revise su token y su ID de comercio en Render.",
 "{n} night":"{n} noche",
 "{n} nights":"{n} noches",
 "Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Profit here and on every other tab updates right away.":"Sus ventas de la semana, noche por noche. Escriba lo que pagó a los trabajadores y otros gastos de cada noche. La ganancia aquí y en las demás secciones se actualiza al instante.",
@@ -602,7 +603,7 @@ const SALES = { _d:null, prices:Object.fromEntries(MENU.map(m=>[m.n,m.p])), live
       const r = await fetch("/api/sales", {credentials:"same-origin", cache:"no-store"});
       if(r.status === 401){ location.href = "/login"; return; }
       const j = await r.json();
-      if((j.status === "ready" || j.status === "error") && j.days && j.days.length){ this._d = j.days; this.prices = j.prices || {}; this.live = true; this.source = j.source || ""; this.state = j.status === "ready" ? "live" : "stale"; this.msg = j.message || ""; this.updated = j.updated || 0; }
+      if((j.status === "ready" || j.status === "error") && j.days && j.days.length){ this._d = j.days; this.prices = j.prices || {}; this.live = true; this.source = j.source || ""; this.acctErr = j.accountErrors || []; this.state = j.status === "ready" ? "live" : "stale"; this.msg = j.message || ""; this.updated = j.updated || 0; }
       else if(j.status === "loading"){ this.state = "loading"; setTimeout(() => this.load(), 4000); }
       else { this.state = j.status || "sample"; this.msg = j.message || ""; }
     } catch(e){ this.state = "sample"; }
@@ -834,6 +835,7 @@ function banner(){
   else if(SALES.state === "not_configured") m.push(t("<b>Clover is not connected on the server.</b> The sales shown are sample data."));
   else if(!SALES.live) m.push(t("<b>The sales shown are sample data.</b> Events, costs and inventory you enter are real and are saved on this device."));
   else if(SALES.source === "orders") m.push(t("<b>Totals are estimated from orders.</b> Give the Clover token read access to Payments so the totals match Clover exactly."));
+  if(SALES.live && SALES.acctErr && SALES.acctErr.length) m.push(t("<b>One of your Clover accounts did not load, so its sales are missing from the totals.</b> Check its token and merchant ID in Render.") + " " + esc(SALES.acctErr.join("; ")));
   if(!S.db && S.loaded && !S.local) m.push(t("<b>Saving is off in this view.</b> Events and inventory will not be kept."));
   if(S.slow) m.push(t("<b>Still loading saved data.</b> It may be out of date until the connection answers."));
   if(!m.length) return "";
