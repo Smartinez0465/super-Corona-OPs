@@ -195,6 +195,7 @@ const ES = {};
 function t(s, v){ let o = (LANG === "es" && ES[s]) || s; if(v) o = o.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m); return o; }
 const pl = (n, one, many) => t(n === 1 ? one : many, {n});
 Object.assign(ES, {
+"Month":"Mes",
 "Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Weekly bills like property tax, utilities and insurance come off once, at the bottom of the week.":"Sus ventas de la semana, noche por noche. Escriba lo que pagó a los trabajadores y otros gastos de cada noche. Las cuentas semanales, como impuestos de la propiedad, servicios y seguro, se restan una sola vez, al final de la semana.",
 "Week total":"Total de la semana",
 "Weekly bills":"Cuentas semanales",
@@ -1107,7 +1108,16 @@ const dsId = d => "ds-"+d, doId = d => "do-"+d;
 function viewDaily(){
   const days = SALES.days(), ws = addDays(weekStart(today), -7*S.dWeekBack), from = key(ws), to = key(addDays(ws,6));
   const list = days.filter(d => d.date>=from && d.date<=to).reverse();
-  const oldest = days.length ? days[0].date : from, canBack = from > oldest;
+  const oldest = days.length ? days[0].date : from, thisWk = weekStart(today);
+  /* every week that has sales loaded, newest first, grouped by the month its Monday falls in */
+  const weeks = []; for(let b=0; b<60; b++){ const st = addDays(thisWk, -7*b); if(key(addDays(st,6)) < oldest) break; weeks.push({b, st}); }
+  const mk = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+  const months = [...new Set(weeks.map(w => mk(w.st)))], selM = mk(ws);
+  const usd = d => (d.getMonth()+1)+"/"+d.getDate()+"/"+String(d.getFullYear()).slice(2);
+  const wkLabel = st => usd(st)+" - "+usd(addDays(st,6));
+  const picker = `<div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+    <select class="mini" style="width:auto;text-align:left" data-dmonth aria-label="${t("Month")}">${months.map(m => { const [y,mo] = m.split("-").map(Number); return `<option value="${m}" ${m===selM?"selected":""}>${cap(MON[mo-1])} ${y}</option>`; }).join("")}</select>
+    <div class="seg" role="group" aria-label="${t("Week")}">${weeks.filter(w => mk(w.st)===selM).reverse().map(w => `<button aria-pressed="${w.b===S.dWeekBack}" data-dweek="${w.b}">${wkLabel(w.st)}</button>`).join("")}</div></div>`;
   const isRep = c => c.repeat==="weekly" || c.repeat==="monthly";
   /* Weekly bills (repeating costs like property tax, utilities and insurance, plus the "Other costs per week" estimate) are taken off once, for the whole week, not night by night. */
   const billItems = S.costs.filter(c => c.cat!=="Staff pay" && isRep(c));
@@ -1135,10 +1145,11 @@ function viewDaily(){
       <tr class="tot"><td><b>${t("Week total")}</b></td><td class="r num"><b>${money(T.gross)}</b></td><td class="r num muted">${money(T.cogs)}</td><td class="r num">${money(T.labor)}</td><td class="r num">${money(T.other)}</td><td class="r num">${T.ev?money(T.ev):"-"}</td><td class="r num ${T.net>=0?"pos":"neg"}"><b>${money(T.net)}</b></td></tr>
       <tr class="tot"><td colspan="6">${t("Weekly bills")}${billNames.length?`<div class="muted small">${esc(billNames.join(", "))}</div>`:""}</td><td class="r num neg">${bills>0?"-"+money(bills):money(0)}</td></tr>
       <tr class="tot grand"><td colspan="6"><b>${t("How the week did")}</b></td><td class="r num ${weekNetAmt>=0?"pos":"neg"}"><b>${money(weekNetAmt)}</b></td></tr></tfoot>` : "";
-  const label = shortDate(ws)+" - "+shortDate(addDays(ws,6));
+  const label = wkLabel(ws);
   return `
   <div class="head rise"><div><h2>${t("Day by day")}</h2><p>${t("Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Weekly bills like property tax, utilities and insurance come off once, at the bottom of the week.")}</p></div>
-    <div class="row"><button class="btn sm" data-act="dweek-prev" ${canBack?"":"disabled"}>${t("Earlier week")}</button><button class="btn sm" data-act="dweek-today">${t("This week")}</button><button class="btn sm" data-act="dweek-next" ${S.dWeekBack>0?"":"disabled"}>${t("Later week")}</button></div></div>
+</div></div>
+  ${picker}
   ${banner()}
   <div class="grid g4">
     <div class="card stat"><span class="k">${t("Sales this week")}</span><span class="v num">${money(T.gross)}</span><span class="s">${label} &middot; ${pl(list.length,"{n} night","{n} nights")}</span></div>
@@ -1277,6 +1288,7 @@ document.addEventListener("click", async ev => {
   if((el = t0.closest("[data-lang]"))){ setLang(el.dataset.lang); return; }
   if((el = t0.closest("[data-tab],[data-go]"))){ S.tab = el.dataset.tab || el.dataset.go; render(); window.scrollTo(0,0); return; }
   if((el = t0.closest("[data-report]"))){ S.report = el.dataset.report; render(); return; }
+  if((el = t0.closest("[data-dweek]"))){ S.dWeekBack = +el.dataset.dweek; render(); return; }
   if((el = t0.closest("[data-week]"))){ S.weekBack = +el.dataset.week; render(); return; }
   if((el = t0.closest("[data-tday]"))){ S.trendDay = el.dataset.tday; render(); return; }
   if((el = t0.closest("[data-filter]"))){ S.invFilter = el.dataset.filter; render(); return; }
@@ -1298,9 +1310,6 @@ document.addEventListener("click", async ev => {
     else if(a==="edit-item") openItem(id);
     else if(a==="month-prev") { S.month = new Date(S.month.getFullYear(), S.month.getMonth()-1, 1); render(); }
     else if(a==="month-next") { S.month = new Date(S.month.getFullYear(), S.month.getMonth()+1, 1); render(); }
-    else if(a==="dweek-prev") { S.dWeekBack++; render(); }
-    else if(a==="dweek-next") { S.dWeekBack = Math.max(0, S.dWeekBack-1); render(); }
-    else if(a==="dweek-today") { S.dWeekBack = 0; render(); }
     else if(a==="month-today") { S.month = new Date(today.getFullYear(), today.getMonth(), 1); render(); }
     else if(a==="receive"){
       const i = S.inv.find(x=>x.id===id); if(!i) return;
@@ -1331,6 +1340,12 @@ document.addEventListener("keydown", ev => {
   if((ev.key==="Enter"||ev.key===" ") && ev.target.matches && ev.target.matches(".day[data-cal]")){ ev.preventDefault(); openEvent(null, ev.target.dataset.cal); }
 });
 document.addEventListener("change", async ev => {
+  const dm = ev.target.closest && ev.target.closest("[data-dmonth]");
+  if(dm){ /* jump to the latest week of the chosen month */
+    const [y,mo] = dm.value.split("-").map(Number), thisWk = weekStart(today);
+    for(let b=0; b<60; b++){ const st = addDays(thisWk, -7*b); if(st.getFullYear()===y && st.getMonth()===mo-1){ S.dWeekBack = b; break; } }
+    render(); return;
+  }
   const dc = ev.target.closest && ev.target.closest("[data-daycost]");
   if(dc){
     const date = dc.dataset.date, staff = dc.dataset.daycost==="staff", id = (staff?dsId:doId)(date), raw = dc.value.trim(), amt = Math.round((+raw)*100)/100;
