@@ -286,7 +286,7 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x"), p = url.pathname;
   const secure = req.headers["x-forwarded-proto"] === "https";
   for (const [k, v] of Object.entries(baseHeaders(secure))) res.setHeader(k, v);
-  if (secure === false && req.headers["x-forwarded-proto"] === "http" && req.headers.host) { res.writeHead(301, { Location: "https://" + req.headers.host + req.url }); return res.end(); }
+  if (p === "/healthz") { res.writeHead(200, { "Content-Type": "text/plain", "Cache-Control": "no-store" }); return res.end("ok"); } // for Render's health check; shows nothing private
   if (p === "/robots.txt") { res.writeHead(200, { "Content-Type": "text/plain" }); return res.end("User-agent: *\nDisallow: /\n"); }
   if (p === "/login" && req.method === "POST") {
     const ip = ipOf(req), f = fails.get(ip) || { n: 0, until: 0 };
