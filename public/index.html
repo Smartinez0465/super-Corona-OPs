@@ -85,6 +85,8 @@ p{margin:0}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .tablewrap{overflow-x:auto}
 .mini{width:104px;min-height:42px;padding:8px 10px;text-align:right;background:var(--bg);border:1px solid var(--line);border-radius:8px;font-size:16px;font-variant-numeric:tabular-nums}
+tfoot tr.tot td{border-top:1px solid var(--line);background:var(--surface2)}
+tfoot tr.grand td{border-top:2px solid var(--ink);font-size:1.05em}
 .mini:focus{border-color:var(--accent);outline:none}
 .mini::placeholder{color:var(--muted);opacity:.8}
 table{border-collapse:collapse;width:100%;font-size:16px}
@@ -193,6 +195,16 @@ const ES = {};
 function t(s, v){ let o = (LANG === "es" && ES[s]) || s; if(v) o = o.replace(/\{(\w+)\}/g, (m, k) => k in v ? v[k] : m); return o; }
 const pl = (n, one, many) => t(n === 1 ? one : many, {n});
 Object.assign(ES, {
+"Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Weekly bills like property tax, utilities and insurance come off once, at the bottom of the week.":"Sus ventas de la semana, noche por noche. Escriba lo que pagó a los trabajadores y otros gastos de cada noche. Las cuentas semanales, como impuestos de la propiedad, servicios y seguro, se restan una sola vez, al final de la semana.",
+"Week total":"Total de la semana",
+"Weekly bills":"Cuentas semanales",
+"How the week did":"Resultado de la semana",
+"Nightly costs":"Gastos de las noches",
+"Drinks, staff, other and events. Staff pay {a} of {b} nights entered":"Bebidas, personal, otros y eventos. Pago al personal: {a} de {b} noches anotadas",
+"Taken off once for the whole week":"Se resta una vez por toda la semana",
+"Sales minus nightly costs and weekly bills":"Ventas menos gastos de las noches y cuentas semanales",
+"Gray numbers in an empty box are estimates. Type the real amount to replace them, or clear the box to go back to the estimate. Event costs come from the Events tab. Weekly and monthly costs from the Costs tab count as weekly bills.":"Los números grises en una casilla vacía son estimados. Escriba la cantidad real para reemplazarlos, o borre la casilla para volver al estimado. Los costos de eventos vienen de la sección Eventos. Los gastos semanales y mensuales de la sección Costos cuentan como cuentas semanales.",
+"Other costs per week":"Otros gastos por semana",
 "<b>One of your Clover accounts did not load, so its sales are missing from the totals.</b> Check its token and merchant ID in Render.":"<b>Una de sus cuentas de Clover no cargó, así que sus ventas faltan en los totales.</b> Revise su token y su ID de comercio en Render.",
 "{n} night":"{n} noche",
 "{n} nights":"{n} noches",
@@ -1095,35 +1107,47 @@ const dsId = d => "ds-"+d, doId = d => "do-"+d;
 function viewDaily(){
   const days = SALES.days(), ws = addDays(weekStart(today), -7*S.dWeekBack), from = key(ws), to = key(addDays(ws,6));
   const list = days.filter(d => d.date>=from && d.date<=to).reverse();
-  const w = list.length ? weekNet(days, list[list.length-1].date, list[0].date) : null;
-  const costsOf = x => x.cogs + x.labor + x.evc + x.other;
   const oldest = days.length ? days[0].date : from, canBack = from > oldest;
+  const isRep = c => c.repeat==="weekly" || c.repeat==="monthly";
+  /* Weekly bills (repeating costs like property tax, utilities and insurance, plus the "Other costs per week" estimate) are taken off once, for the whole week, not night by night. */
+  const billItems = S.costs.filter(c => c.cat!=="Staff pay" && isRep(c));
+  let bills = S.settings.fixedWeek;
+  for(let i=0;i<7;i++){ const k = key(addDays(ws,i)); bills += sum(billItems.filter(c=>covers(c,k)).map(perDay)); }
+  const T = {gross:0, cogs:0, labor:0, other:0, ev:0, net:0, actual:0};
   const rows = list.map(d => {
     const c = costOn(d.date, d.gross), evs = S.events.filter(e=>e.date===d.date), ev = sum(evs.map(e=>(+e.djFee||0)+(+e.otherCost||0)));
     const mineS = S.costs.find(x=>x.id===dsId(d.date)), mineO = S.costs.find(x=>x.id===doId(d.date));
     const restS = sum(S.costs.filter(x=>x.cat==="Staff pay" && x.id!==dsId(d.date) && covers(x,d.date)).map(perDay));
-    const restO = c.other - (mineO ? +mineO.amount||0 : 0);
-    const net = d.gross - c.cogs - c.labor - c.other - ev;
+    const restO = sum(S.costs.filter(x=>x.cat!=="Staff pay" && !isRep(x) && x.id!==doId(d.date) && covers(x,d.date)).map(perDay));
+    const other = (mineO ? +mineO.amount||0 : 0) + restO, net = d.gross - c.cogs - c.labor - other - ev;
+    T.gross += d.gross; T.cogs += c.cogs; T.labor += c.labor; T.other += other; T.ev += ev; T.net += net; if(c.actualStaff) T.actual++;
     return `<tr><td><b>${fmtDay(d.date)}</b>${evs.length?`<div class="muted small">${esc(evs.map(e=>e.name).join(", "))}</div>`:""}</td>
       <td class="r num"><b>${money(d.gross)}</b></td><td class="r num muted">${money(c.cogs)}</td>
       <td class="r"><input class="mini" id="dc-s-${d.date}" data-daycost="staff" data-date="${d.date}" type="number" inputmode="decimal" min="0" step="0.01" value="${mineS?esc(mineS.amount):""}" placeholder="${c.actualStaff?"0":"~"+Math.round(c.labor)}" aria-label="${t("Staff pay")} ${fmtDay(d.date)}">${restS>0?`<div class="muted small">${t("+{amt} from Costs tab",{amt:money(restS)})}</div>`:""}</td>
-      <td class="r"><input class="mini" id="dc-o-${d.date}" data-daycost="other" data-date="${d.date}" type="number" inputmode="decimal" min="0" step="0.01" value="${mineO?esc(mineO.amount):""}" placeholder="0" aria-label="${t("Other costs")} ${fmtDay(d.date)}">${restO>0.005?`<div class="muted small">${t("+{amt} automatic",{amt:money(restO)})}</div>`:""}</td>
+      <td class="r"><input class="mini" id="dc-o-${d.date}" data-daycost="other" data-date="${d.date}" type="number" inputmode="decimal" min="0" step="0.01" value="${mineO?esc(mineO.amount):""}" placeholder="0" aria-label="${t("Other costs")} ${fmtDay(d.date)}">${restO>0.005?`<div class="muted small">${t("+{amt} from Costs tab",{amt:money(restO)})}</div>`:""}</td>
       <td class="r num">${ev?money(ev):`<span class="muted">-</span>`}</td>
       <td class="r num ${net>=0?"pos":"neg"}"><b>${money(net)}</b></td></tr>`;
   }).join("");
+  const nightCosts = T.cogs + T.labor + T.other + T.ev, weekNetAmt = T.net - bills;
+  const billNames = [...new Set(billItems.filter(c => { for(let i=0;i<7;i++) if(covers(c, key(addDays(ws,i)))) return true; return false; }).map(c => c.note || t(c.cat)))];
+  if(S.settings.fixedWeek > 0) billNames.push(t("Other costs per week"));
+  const foot = list.length ? `<tfoot>
+      <tr class="tot"><td><b>${t("Week total")}</b></td><td class="r num"><b>${money(T.gross)}</b></td><td class="r num muted">${money(T.cogs)}</td><td class="r num">${money(T.labor)}</td><td class="r num">${money(T.other)}</td><td class="r num">${T.ev?money(T.ev):"-"}</td><td class="r num ${T.net>=0?"pos":"neg"}"><b>${money(T.net)}</b></td></tr>
+      <tr class="tot"><td colspan="6">${t("Weekly bills")}${billNames.length?`<div class="muted small">${esc(billNames.join(", "))}</div>`:""}</td><td class="r num neg">${bills>0?"-"+money(bills):money(0)}</td></tr>
+      <tr class="tot grand"><td colspan="6"><b>${t("How the week did")}</b></td><td class="r num ${weekNetAmt>=0?"pos":"neg"}"><b>${money(weekNetAmt)}</b></td></tr></tfoot>` : "";
   const label = shortDate(ws)+" - "+shortDate(addDays(ws,6));
   return `
-  <div class="head rise"><div><h2>${t("Day by day")}</h2><p>${t("Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Profit here and on every other tab updates right away.")}</p></div>
+  <div class="head rise"><div><h2>${t("Day by day")}</h2><p>${t("Your sales for the week, night by night. Type what you paid the workers and any other costs for each night. Weekly bills like property tax, utilities and insurance come off once, at the bottom of the week.")}</p></div>
     <div class="row"><button class="btn sm" data-act="dweek-prev" ${canBack?"":"disabled"}>${t("Earlier week")}</button><button class="btn sm" data-act="dweek-today">${t("This week")}</button><button class="btn sm" data-act="dweek-next" ${S.dWeekBack>0?"":"disabled"}>${t("Later week")}</button></div></div>
   ${banner()}
   <div class="grid g4">
-    <div class="card stat"><span class="k">${t("Sales this week")}</span><span class="v num">${money(w?w.gross:0)}</span><span class="s">${label} &middot; ${pl(list.length,"{n} night","{n} nights")}</span></div>
-    <div class="card stat"><span class="k">${t("Costs this week")}</span><span class="v num">${money(w?costsOf(w):0)}</span><span class="s">${w?t("Staff pay {a} of {b} nights entered",{a:w.actual,b:w.nd}):""}</span></div>
-    <div class="card stat"><span class="k">${t("Staff pay this week")}</span><span class="v num">${money(w?w.labor:0)}</span><span class="s">${w&&w.actual===w.nd&&w.nd?t("Actual, from what you entered"):t("Real where entered, estimated on the other nights")}</span></div>
-    <div class="card stat"><span class="k">${t("Profit this week")}</span><span class="v num ${w&&w.net>=0?"pos":"neg"}">${money(w?w.net:0)}</span><span class="s">${t("After drinks, staff, event and other costs")}</span></div>
+    <div class="card stat"><span class="k">${t("Sales this week")}</span><span class="v num">${money(T.gross)}</span><span class="s">${label} &middot; ${pl(list.length,"{n} night","{n} nights")}</span></div>
+    <div class="card stat"><span class="k">${t("Nightly costs")}</span><span class="v num">${money(nightCosts)}</span><span class="s">${list.length?t("Drinks, staff, other and events. Staff pay {a} of {b} nights entered",{a:T.actual,b:list.length}):""}</span></div>
+    <div class="card stat"><span class="k">${t("Weekly bills")}</span><span class="v num">${money(bills)}</span><span class="s">${t("Taken off once for the whole week")}</span></div>
+    <div class="card stat"><span class="k">${t("How the week did")}</span><span class="v num ${weekNetAmt>=0?"pos":"neg"}">${money(weekNetAmt)}</span><span class="s">${t("Sales minus nightly costs and weekly bills")}</span></div>
   </div>
-  <div class="card"><h3>${label}</h3>${list.length?`<div class="tablewrap"><table><thead><tr><th>${t("Day")}</th><th class="r">${t("Sales")}</th><th class="r">${t("Drinks (estimate)")}</th><th class="r">${t("Staff pay")}</th><th class="r">${t("Other costs")}</th><th class="r">${t("Event costs")}</th><th class="r">${t("Profit")}</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="muted small" style="margin-top:10px">${t("Gray numbers in an empty box are estimates. Type the real amount to replace them, or clear the box to go back to the estimate. Event costs come from the Events tab.")}</p>`
+  <div class="card"><h3>${label}</h3>${list.length?`<div class="tablewrap"><table><thead><tr><th>${t("Day")}</th><th class="r">${t("Sales")}</th><th class="r">${t("Drinks (estimate)")}</th><th class="r">${t("Staff pay")}</th><th class="r">${t("Other costs")}</th><th class="r">${t("Event costs")}</th><th class="r">${t("Profit")}</th></tr></thead><tbody>${rows}</tbody>${foot}</table></div>
+    <p class="muted small" style="margin-top:10px">${t("Gray numbers in an empty box are estimates. Type the real amount to replace them, or clear the box to go back to the estimate. Event costs come from the Events tab. Weekly and monthly costs from the Costs tab count as weekly bills.")}</p>`
     : `<div class="empty">${t("No sales loaded for this week.")}</div>`}</div>`;
 }
 
