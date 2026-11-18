@@ -33,6 +33,7 @@ if (!PASSWORD) {
   console.error("APP_PASSWORD is not set. Set it in your .env file or your host's environment settings, then start again.");
   process.exit(1);
 }
+if (PASSWORD.length < 12) console.warn("Warning: APP_PASSWORD is short. Use at least 12 characters (for example four random words) so nobody can guess it.");
 
 /* ---------- dates in the bar's time zone ---------- */
 const dateFmt = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
@@ -214,11 +215,38 @@ const SESSION = crypto.createHmac("sha256", PASSWORD).update("korona-session:v1"
 const safeEq = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && crypto.timingSafeEqual(x, y); };
 const cookieOf = req => Object.fromEntries((req.headers.cookie || "").split(";").map(c => c.trim().split(/=(.*)/s).slice(0, 2)).filter(p => p[0]));
 const isAuthed = req => { const c = cookieOf(req).korona_session; return !!c && safeEq(c, SESSION); };
-const fails = new Map();
-const ipOf = req => String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
+/* Wrong-password limits. Per address: 5 tries, then locked for 15 minutes. Across everyone: 40 wrong tries in 15 minutes
+   pauses all sign-ins for 15 minutes, so changing addresses does not help someone guessing. Each wrong try also waits a second. */
+const fails = new Map(), recentFails = [];
+const LOCK_MS = 15 * 60e3, PER_IP = 5, GLOBAL = 40;
+/* Render sits behind Cloudflare, which puts the visitor's real address in True-Client-IP / CF-Connecting-IP and overwrites
+   anything a visitor sends there. X-Forwarded-For is only a fallback: Render appends to it, so its first entries can be faked;
+   the entry just before the last one (Cloudflare's own address) is the visitor. */
+const ipOf = req => {
+  const h = req.headers, direct = String(h["true-client-ip"] || h["cf-connecting-ip"] || "").trim();
+  if (direct) return direct;
+  const xf = String(h["x-forwarded-for"] || "").split(",").map(x => x.trim()).filter(Boolean);
+  return xf.length >= 2 ? xf[xf.length - 2] : xf[0] || String(req.socket.remoteAddress || "");
+};
+let globalLockUntil = 0;
+function noteFail(ip) {
+  const now = Date.now(), f = fails.get(ip) || { n: 0, until: 0 };
+  f.n += 1; if (f.n >= PER_IP) { f.until = now + LOCK_MS; f.n = 0; } fails.set(ip, f);
+  recentFails.push(now); while (recentFails.length && recentFails[0] < now - LOCK_MS) recentFails.shift();
+  if (recentFails.length >= GLOBAL) { globalLockUntil = now + LOCK_MS; recentFails.length = 0; console.warn("Many wrong passwords: sign-in paused for 15 minutes"); }
+  if (fails.size > 5000) for (const [k, v] of fails) if (v.until < now) fails.delete(k);
+}
+/* headers on every response: never indexed by search engines, never shown inside another site, no tracking referrers */
+function baseHeaders(secure) {
+  const h = { "X-Robots-Tag": "noindex, nofollow, noarchive", "X-Frame-Options": "DENY", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'" };
+  if (secure) h["Strict-Transport-Security"] = "max-age=31536000";
+  return h;
+}
 function loginPage(msg) {
   const m = String(msg || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0C1A16"><title>Super Korona Ops</title>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0C1A16"><meta name="robots" content="noindex,nofollow"><title>Super Korona Ops</title>
 <style>:root{color-scheme:light dark}body{margin:0;min-height:100vh;display:grid;place-items:center;font:18px/1.5 system-ui,sans-serif;background:#EBEFEC;color:#12231E;padding:16px}
 @media(prefers-color-scheme:dark){body{background:#0C1A16;color:#E8F1ED}input{background:#13251F!important;color:#E8F1ED!important;border-color:#26443B!important}.lang button{background:#13251F!important;color:#E8F1ED!important;border-color:#26443B!important}.lang button[aria-pressed=true]{background:#E8F1ED!important;color:#0C1A16!important}}
 form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px}h1{margin:0;font-size:32px}label{font-size:16px;font-weight:600}
@@ -230,7 +258,7 @@ button.go{padding:13px;border:0;border-radius:10px;background:#B35A00;color:#fff
 <div><label for="p" data-t="Password">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required autofocus></div><div class="e" role="alert" data-t="${m}">${m}</div><button class="go" type="submit" data-t="Sign in">Sign in</button></form>
 <script>
 (function(){
-  var ES={"Password":"Contrase\u00f1a","Sign in":"Entrar","That password is not right.":"Esa contrase\u00f1a no es correcta.","Too many tries. Wait 10 minutes and try again.":"Demasiados intentos. Espere 10 minutos e intente de nuevo."};
+  var ES={"Password":"Contrase\u00f1a","Sign in":"Entrar","That password is not right.":"Esa contrase\u00f1a no es correcta.","Too many tries. Wait 15 minutes and try again.":"Demasiados intentos. Espere 15 minutos e intente de nuevo."};
   var l="en"; try{ var s=localStorage.getItem("korona:lang"); if(s==="en"||s==="es") l=s; else l=String((navigator.languages&&navigator.languages[0])||navigator.language||"en").toLowerCase().indexOf("es")===0?"es":"en"; }catch(e){}
   function apply(x){ l=x; document.documentElement.lang=x;
     Array.prototype.forEach.call(document.querySelectorAll("[data-t]"),function(e){ var k=e.getAttribute("data-t"); if(k) e.textContent=(x==="es"&&ES[k])||k; });
@@ -249,7 +277,7 @@ const PUBLIC_OK = new Set(["/manifest.webmanifest", "/sw.js", "/icon-192.png", "
 function serveFile(res, file, extra) {
   fs.readFile(file, (err, buf) => {
     if (err) { res.writeHead(404, { "Content-Type": "text/plain" }); return res.end("Not found"); }
-    res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", ...extra });
+    res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream", ...extra });
     res.end(buf);
   });
 }
@@ -257,20 +285,24 @@ function serveFile(res, file, extra) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x"), p = url.pathname;
   const secure = req.headers["x-forwarded-proto"] === "https";
+  for (const [k, v] of Object.entries(baseHeaders(secure))) res.setHeader(k, v);
+  if (secure === false && req.headers["x-forwarded-proto"] === "http" && req.headers.host) { res.writeHead(301, { Location: "https://" + req.headers.host + req.url }); return res.end(); }
+  if (p === "/robots.txt") { res.writeHead(200, { "Content-Type": "text/plain" }); return res.end("User-agent: *\nDisallow: /\n"); }
   if (p === "/login" && req.method === "POST") {
     const ip = ipOf(req), f = fails.get(ip) || { n: 0, until: 0 };
-    if (f.until > Date.now()) { res.writeHead(429, { "Content-Type": "text/html; charset=utf-8" }); return res.end(loginPage("Too many tries. Wait 10 minutes and try again.")); }
+    if (f.until > Date.now() || globalLockUntil > Date.now()) { res.writeHead(429, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }); return res.end(loginPage("Too many tries. Wait 15 minutes and try again.")); }
     const pw = new URLSearchParams(await readBody(req)).get("password") || "";
     if (safeEq(crypto.createHash("sha256").update(pw).digest("hex"), crypto.createHash("sha256").update(PASSWORD).digest("hex"))) {
       fails.delete(ip);
       res.writeHead(302, { Location: "/", "Set-Cookie": `korona_session=${SESSION}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${secure ? "; Secure" : ""}` });
       return res.end();
     }
-    f.n += 1; if (f.n >= 5) { f.until = Date.now() + 10 * 60e3; f.n = 0; } fails.set(ip, f);
-    res.writeHead(401, { "Content-Type": "text/html; charset=utf-8" }); return res.end(loginPage("That password is not right."));
+    noteFail(ip);
+    await new Promise(r => setTimeout(r, 1000));
+    res.writeHead(401, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }); return res.end(loginPage("That password is not right."));
   }
   if (p === "/login") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }); return res.end(loginPage("")); }
-  if (p === "/logout") { res.writeHead(302, { Location: "/login", "Set-Cookie": "korona_session=; Path=/; Max-Age=0" }); return res.end(); }
+  if (p === "/logout") { res.writeHead(302, { Location: "/login", "Set-Cookie": `korona_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure ? "; Secure" : ""}`, "Clear-Site-Data": '"cache"' }); return res.end(); }
   if (PUBLIC_OK.has(p)) return serveFile(res, path.join(PUBLIC_DIR, p), { "Cache-Control": "no-cache" });
   if (!isAuthed(req)) {
     if (p.startsWith("/api/")) { res.writeHead(401, { "Content-Type": "application/json" }); return res.end('{"status":"login"}'); }
@@ -299,7 +331,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
     return res.end(JSON.stringify(out, null, 2));
   }
-  if (p === "/" || p === "/index.html") return serveFile(res, path.join(PUBLIC_DIR, "index.html"), { "Cache-Control": "no-cache" });
+  if (p === "/" || p === "/index.html") return serveFile(res, path.join(PUBLIC_DIR, "index.html"), { "Cache-Control": "no-store" });
   res.writeHead(404, { "Content-Type": "text/plain" }); res.end("Not found");
 });
 

@@ -1,6 +1,6 @@
 # Super Korona Ops
 
-Sales reports, a 14-day forecast, busy-hour and drink trends, event and DJ scheduling with profit and loss, and inventory, for the bar. It reads your sales from Clover through a small server, and installs on a phone like an app.
+Sales reports, a 14-day forecast, busy-hour and drink trends, a day-by-day weekly profit view with staff pay and costs, and inventory, for the bar. It reads your sales from Clover through a small server, and installs on a phone like an app.
 
 There is nothing to install: the server uses only what comes with Node.js 20 or newer.
 
@@ -37,10 +37,17 @@ The app is in English and Spanish. The English / Español switch is at the top o
 - To check accuracy, open `/api/diagnose` (while signed in). The `lastSevenDays` rows show what the app shows for each business day, the payments total, refunds, tips and the order total. Compare a row with Clover > Transactions > Payments for the same time window.
 - **Costs tab:** enter what you actually paid. Staff pay is entered per day. Rent, utilities, insurance and other costs can be one-time, weekly or monthly (with an optional stop date). For any day with no staff pay entered, the app estimates staff pay as a percentage of sales. Do not enter drink or liquor purchases; they are covered by the cost-of-goods percentage.
 - Cost of goods, estimated staff pay and weekly fixed costs are percentages and amounts you set at the bottom of the Costs tab. They are only used for days with nothing entered.
-- Events, costs and inventory are saved in the browser on the device you use. They do not sync between phone and computer yet.
+- Costs and inventory are saved in the browser on the device you use. They do not sync between phone and computer yet.
 
 ## Files
 
 - `server.js`: login, Clover sales feed, serves the page.
 - `public/index.html`: the dashboard.
 - `public/manifest.webmanifest`, `public/sw.js`, icons: phone install.
+
+## Privacy
+
+- Every page and every data address needs the app password. Search engines are told not to index the site, and it can't be shown inside another website.
+- After 5 wrong passwords from one address, that address is locked out for 15 minutes. After 40 wrong passwords from anywhere within 15 minutes, all sign-ins pause for 15 minutes. Each wrong try is also slowed down.
+- Use a long `APP_PASSWORD` (12+ characters, for example four random words) and share it only with family. Changing it in Render signs out every device.
+- Clover tokens and the password live only in Render's environment settings, never in this repository.
